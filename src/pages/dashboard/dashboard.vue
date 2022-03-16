@@ -35,8 +35,8 @@
               :collapsed-icon-size="22"
               :options="menuOptions"
               style="height: 92.5vh"
+              :value='currentMenu'
               @update:value="handleUpdateMenu"
-              @update:expanded-keys="handleUpdateExpandedKeys"
             />
           </n-layout-sider>
           <n-layout-content >
@@ -71,13 +71,13 @@
 <script lang="ts">
 import { h, defineComponent, ref, Component } from 'vue'
 import Avatar from 'cyhComponents/Avatar.vue'
-import { darkTheme } from 'naive-ui'
-import { NIcon } from 'naive-ui'
-import {
-  BookOutline as BookIcon,
-  PersonOutline as PersonIcon,
-  WineOutline as WineIcon
-} from '@vicons/ionicons5'
+import { darkTheme, NIcon } from 'naive-ui'
+import { BookOutline as BookIcon, PersonOutline as PersonIcon, WineOutline as WineIcon } from '@vicons/ionicons5'
+
+import { useRouter, useRoute, RouteRecordName } from 'vue-router'
+
+
+
 
 function renderIcon (icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) })
@@ -86,8 +86,19 @@ function renderIcon (icon: Component) {
 const menuOptions = [
   {
     label: '首页',
-    key: 'hear-the-wind-sing',
-    icon: renderIcon(BookIcon)
+    value: 'home',
+    key: 'home',
+    icon: renderIcon(BookIcon),
+    routerLink: '/'
+  },
+  {
+    key: 'divider-1',
+    type: 'divider',
+    props: {
+      style: {
+        marginLeft: '32px'
+      }
+    }
   },
   {
     label: '人事管理',
@@ -96,14 +107,15 @@ const menuOptions = [
     children: [
       {
         label: '人员管理',
-        key: 'rat'
+        key: 'rat',
+        routerLink: '/manage'
       }
     ]
   },
   {
     label: '请假管理',
     key: 'a-wild-sheep-chase',
-    disabled: true,
+    routerLink: '/out',    
     icon: renderIcon(BookIcon)
   },
   {
@@ -148,25 +160,40 @@ const menuOptions = [
             key: 'sandwich'
           }
         ]
-      },
-      {
-        label: '过去增多，未来减少',
-        key: 'the-past-increases-the-future-recedes'
       }
     ]
-  }
+  },
+   {
+    label: '个人中心',
+    value: 'profile',
+    key: 'profile',
+    icon: renderIcon(BookIcon),
+    routerLink: '/profile'
+  },
 ]
 
 export default defineComponent({
+  
   components: {
     Avatar
   },
+  created() {
+      this.currentMenu= this.$route.name
+  },
   setup () {
+    const currentMenu = ref()
+    const $router = useRouter()
+    const handleUpdateMenu:(age:any,arg2:any) => void = (args:any,currentItem:any) => {    
+    $router.push(currentItem.routerLink)
+    currentMenu.value = args
+  }
     return {
       inverted: ref(false),
       menuOptions,
       darkTheme,
+      currentMenu,
       theme: ref(true),
+      handleUpdateMenu,
       title: process.env.VUE_APP_TITLE
     }
   }
