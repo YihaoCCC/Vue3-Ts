@@ -39,12 +39,14 @@
     
 <script  lang='ts'>
 
-import { reactive } from "@vue/reactivity";
+import { reactive, getCurrentInstance } from "vue";
 import { BagRemoveOutline, PersonOutline } from '@vicons/ionicons5'
 import { useRouter } from 'vue-router'
 export default {
     
     setup() {
+        const context = getCurrentInstance()
+        const $ckHttp = context?.appContext.config.globalProperties.$ckHttp
         const formValue = reactive({
             username :'',
             password: ''
@@ -63,6 +65,10 @@ export default {
                         // localStorage.setItem('permissions', permissions);
                         // localStorage.setItem('token', token);
                         // //让路由跳转页面，这里的Home是home.vue页面的名字
+                        // /user/login/{userId}&{password}
+                $ckHttp.get(`/api/user/login/${formValue.username}&${formValue.password}`).then((res:any) => {
+                    console.log(res)
+                })
                 console.log(formValue.username+formValue.password)
                 router.push('/home');
 

@@ -5,5 +5,8 @@ module.exports = {
                 cyhComponents: '@/components'
             }
         }
+    },
+    devServe: {
+        
     }
 }
