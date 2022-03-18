@@ -13,6 +13,22 @@ import 'animate.css';
 ckHttp.testHttp()
 const app = createApp(App)
 
+app.config.globalProperties.$ckHttp = ckHttp
+
+app.config.globalProperties.isAuth = function (tag:string) {
+    let flag = true
+    console.log(tag)
+    const result = ['USER:UPDATE','USER:SELECT']
+    let item
+    for ( item of result ) {
+        if(item === tag) {
+            flag = false
+            break
+        }
+    }
+    return flag
+}
+
 setNavieUiComponents(app)
 
 app.use(router)

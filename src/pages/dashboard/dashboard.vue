@@ -69,12 +69,12 @@
 </template>
 
 <script lang="ts">
-import { h, defineComponent, ref, Component } from 'vue'
+import { h, defineComponent, ref, Component, getCurrentInstance } from 'vue'
 import Avatar from 'cyhComponents/Avatar.vue'
 import { darkTheme, NIcon } from 'naive-ui'
 import { BookOutline as BookIcon, PersonOutline as PersonIcon, WineOutline as WineIcon } from '@vicons/ionicons5'
 
-import { useRouter, useRoute, RouteRecordName } from 'vue-router'
+import { useRouter} from 'vue-router'
 
 
 
@@ -83,94 +83,9 @@ function renderIcon (icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
 
-const menuOptions = [
-  {
-    label: '首页',
-    value: 'home',
-    key: 'home',
-    icon: renderIcon(BookIcon),
-    routerLink: '/'
-  },
-  {
-    key: 'divider-1',
-    type: 'divider',
-    props: {
-      style: {
-        marginLeft: '32px'
-      }
-    }
-  },
-  {
-    label: '人事管理',
-    key: 'pinball-1973',
-    icon: renderIcon(BookIcon),
-    children: [
-      {
-        label: '人员管理',
-        key: 'rat',
-        routerLink: '/manage'
-      }
-    ]
-  },
-  {
-    label: '请假管理',
-    key: 'a-wild-sheep-chase',
-    routerLink: '/out',    
-    icon: renderIcon(BookIcon)
-  },
-  {
-    label: '系统管理',
-    key: 'dance-dance-dance',
-    icon: renderIcon(BookIcon),
-    children: [
-      {
-        type: 'group',
-        label: '人物',
-        key: 'people',
-        children: [
-          {
-            label: '叙事者',
-            key: 'narrator',
-            icon: renderIcon(PersonIcon)
-          },
-          {
-            label: '羊男',
-            key: 'sheep-man',
-            icon: renderIcon(PersonIcon)
-          }
-        ]
-      },
-      {
-        label: '饮品',
-        key: 'beverage',
-        icon: renderIcon(WineIcon),
-        children: [
-          {
-            label: '威士忌',
-            key: 'whisky'
-          }
-        ]
-      },
-      {
-        label: '食物',
-        key: 'food',
-        children: [
-          {
-            label: '三明治',
-            key: 'sandwich'
-          }
-        ]
-      }
-    ]
-  },
-   {
-    label: '个人中心',
-    value: 'profile',
-    key: 'profile',
-    icon: renderIcon(BookIcon),
-    routerLink: '/profile'
-  },
-]
+
+
+
 
 export default defineComponent({
   
@@ -181,6 +96,97 @@ export default defineComponent({
       this.currentMenu= this.$route.name
   },
   setup () {
+    const $isAuth = getCurrentInstance()?.appContext.config.globalProperties.isAuth
+    const menuOptions = [
+      {
+        label: '首页',
+        value: 'home',
+        key: 'home',
+        icon: renderIcon(BookIcon),
+        routerLink: '/'
+      },
+      {
+        key: 'divider-1',
+        type: 'divider',
+        props: {
+          style: {
+            marginLeft: '32px'
+          }
+        }
+      },
+      {
+        label: '人事管理',
+        key: 'pinball-1973',
+        icon: renderIcon(BookIcon),
+        children: [
+          {
+            label: '人员管理',
+            key: 'rat',
+            routerLink: '/manage',
+            disabled: $isAuth('USER:UPDATE')
+          }
+        ]
+      },
+      {
+        label: '请假管理',
+        key: 'a-wild-sheep-chase',
+        routerLink: '/out',    
+        icon: renderIcon(BookIcon)
+      },
+      {
+        label: '系统管理',
+        key: 'dance-dance-dance',
+        icon: renderIcon(BookIcon),
+        children: [
+          {
+            type: 'group',
+            label: '人物',
+            key: 'people',
+            children: [
+              {
+                label: '叙事者',
+                key: 'narrator',
+                icon: renderIcon(PersonIcon)
+              },
+              {
+                label: '羊男',
+                key: 'sheep-man',
+                icon: renderIcon(PersonIcon)
+              }
+            ]
+          },
+          {
+            label: '饮品',
+            key: 'beverage',
+            icon: renderIcon(WineIcon),
+            children: [
+              {
+                label: '威士忌',
+                key: 'whisky'
+              }
+            ]
+          },
+          {
+            label: '食物',
+            key: 'food',
+            children: [
+              {
+                label: '三明治',
+                key: 'sandwich'
+              }
+            ]
+          }
+        ]
+      },
+   {
+    label: '个人中心',
+    value: 'profile',
+    key: 'profile',
+    icon: renderIcon(BookIcon),
+    routerLink: '/profile'
+  },
+]
+    console.log()
     const currentMenu = ref()
     const $router = useRouter()
     const handleUpdateMenu:(age:any,arg2:any) => void = (args:any,currentItem:any) => {    

@@ -16,7 +16,9 @@ import {
   NCard,
   NAvatar,
   NDropdown,
-  NPopover
+  NPopover,
+  NInput,
+  NIcon
 } from 'naive-ui'
 
 
@@ -37,7 +39,9 @@ function setNavieUiComponents(app: {use:(naive:any) => void}):void {
             NCard,
             NAvatar,
             NDropdown,
-            NPopover
+            NPopover,
+            NInput,
+            NIcon
         ]
       })
       app.use(naive)
