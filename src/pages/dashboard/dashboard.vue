@@ -123,7 +123,7 @@ export default defineComponent({
             label: '人员管理',
             key: 'rat',
             routerLink: '/manage',
-            disabled: $isAuth('USER:UPDATE')
+            disabled: $isAuth(1)
           }
         ]
       },

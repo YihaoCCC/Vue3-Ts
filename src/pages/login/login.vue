@@ -29,6 +29,12 @@
                             登录
                         </n-button>
                     </div>
+                    <ul>
+                        <li value='1'>用户修改</li>
+                        <li >部门管理</li>
+                        <li></li>
+                        <li></li>
+                    </ul>
                 </div>
             </div>
             <div class="footer">
@@ -53,7 +59,14 @@ export default {
         })
        const router = useRouter()
         return {
-            
+            permisson: [
+                1,
+                2,
+                3,
+                'ROLE:MANAGE',
+                'USER:MANAGE',
+                                
+            ],
             formValue,
             BagRemoveOutline,
             PersonOutline,

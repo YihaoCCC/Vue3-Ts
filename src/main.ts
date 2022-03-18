@@ -15,12 +15,14 @@ const app = createApp(App)
 
 app.config.globalProperties.$ckHttp = ckHttp
 
-app.config.globalProperties.isAuth = function (tag:string) {
+app.config.globalProperties.isAuth = function (tag:number) {
     let flag = true
     console.log(tag)
-    const result = ['USER:UPDATE','USER:SELECT']
+    
+    // let permisson = localStorage.getItem('permisson')
+    const permisson = ['USER:UPDATE',2,3]
     let item
-    for ( item of result ) {
+    for ( item of permisson ) {
         if(item === tag) {
             flag = false
             break
