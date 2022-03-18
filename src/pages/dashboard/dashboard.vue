@@ -7,7 +7,6 @@
             <span @click="$router.push('/')" style="cursor:pointer">
               {{title}}
             </span>
-            <n-menu mode="horizontal" :inverted="inverted" :options="menuOptions" />
             <div class="header-right">
               <n-popover
                 placement="bottom"
@@ -41,8 +40,12 @@
           </n-layout-sider>
           <n-layout-content >
             <div class="dashboard">
+              <n-message-provider>
+
                 <n-card embedded class="card">
-                    
+                  <div style="margin-bottom: 10px;">
+                    <n-icon><pricetag-outline/>  </n-icon> <span style="margin-left:10px;font-weight:bolder">{{currentName}}</span>
+                  </div>
                         <router-view v-slot="props">
                             <transition 
                                 appear 
@@ -50,11 +53,13 @@
                                 leave-active-class="animate__animated animate__backOutDown"
                                 mode="out-in"
                             >
-                            <component :is="props.Component"></component>
-                    </transition>
+                              <component :is="props.Component"></component>
+                            </transition>
 
                         </router-view>
                 </n-card>
+              </n-message-provider>
+
             </div>
             
           </n-layout-content>
@@ -72,7 +77,12 @@
 import { h, defineComponent, ref, Component, getCurrentInstance } from 'vue'
 import Avatar from 'cyhComponents/Avatar.vue'
 import { darkTheme, NIcon } from 'naive-ui'
-import { BookOutline as BookIcon, PersonOutline as PersonIcon, WineOutline as WineIcon } from '@vicons/ionicons5'
+import { BookOutline as BookIcon, PersonOutline as PersonIcon, WineOutline as WineIcon, 
+          BusinessOutline,
+          PersonOutline,
+          RibbonOutline,
+          PricetagOutline,
+          } from '@vicons/ionicons5'
 
 import { useRouter} from 'vue-router'
 
@@ -90,10 +100,13 @@ function renderIcon (icon: Component) {
 export default defineComponent({
   
   components: {
-    Avatar
+    Avatar,
+    PricetagOutline
   },
   created() {
       this.currentMenu= this.$route.name
+      console.log(this.$route.name)
+      console.log(this.currentMenu)
   },
   setup () {
     const $isAuth = getCurrentInstance()?.appContext.config.globalProperties.isAuth
@@ -115,89 +128,126 @@ export default defineComponent({
         }
       },
       {
-        label: '人事管理',
+        label: '部门管理',
+        key: 'department',
+        icon: renderIcon(BusinessOutline),
+        routerLink: '/department'
+      },
+      {
+        label: '员工管理',
+        key: 'User',
+        icon: renderIcon(PersonOutline),
+        routerLink: '/user'
+      },
+      {
+        label: '奖惩管理',
         key: 'pinball-1973',
-        icon: renderIcon(BookIcon),
+        icon: renderIcon(RibbonOutline),
         children: [
           {
-            label: '人员管理',
+            label: '奖惩记录',
             key: 'rat',
-            routerLink: '/manage',
+            routerLink: '/recordAward',
+            disabled: $isAuth('USER:UPDATE')
+          },
+          {
+            label: '奖惩制度',
+            key: 'rat2',
+            routerLink: '/institution',
             disabled: $isAuth('USER:UPDATE')
           }
         ]
       },
       {
         label: '请假管理',
+        key: 'leave',
+        icon: renderIcon(PersonOutline),
+        routerLink: '/leave'
+      },
+      {
+        label: '公告管理',
+        key: 'message',
+        icon: renderIcon(PersonOutline),
+        routerLink: '/message'
+      },
+      {
+        label: '职位管理',
         key: 'a-wild-sheep-chase',
-        routerLink: '/out',    
+        routerLink: '/position',    
         icon: renderIcon(BookIcon)
       },
       {
-        label: '系统管理',
-        key: 'dance-dance-dance',
+        label: '薪资管理',
+        key: 'money',
         icon: renderIcon(BookIcon),
         children: [
           {
-            type: 'group',
-            label: '人物',
-            key: 'people',
-            children: [
-              {
-                label: '叙事者',
-                key: 'narrator',
-                icon: renderIcon(PersonIcon)
-              },
-              {
-                label: '羊男',
-                key: 'sheep-man',
-                icon: renderIcon(PersonIcon)
-              }
-            ]
+            label: '薪资记录',
+            key: 'money1',
+            routerLink: '/moneyRecord',
+            disabled: $isAuth('USER:UPDATE')
           },
           {
-            label: '饮品',
-            key: 'beverage',
-            icon: renderIcon(WineIcon),
-            children: [
-              {
-                label: '威士忌',
-                key: 'whisky'
-              }
-            ]
-          },
-          {
-            label: '食物',
-            key: 'food',
-            children: [
-              {
-                label: '三明治',
-                key: 'sandwich'
-              }
-            ]
+            label: '薪资制度',
+            key: 'money2',
+            routerLink: '/moneyInstitution',
+            disabled: $isAuth('USER:UPDATE')
           }
         ]
       },
-   {
-    label: '个人中心',
-    value: 'profile',
-    key: 'profile',
-    icon: renderIcon(BookIcon),
-    routerLink: '/profile'
-  },
+      {
+        label: '考勤管理',
+        key: 'Attendance',
+        icon: renderIcon(BookIcon),
+        children: [
+              {
+                label: '签到记录',
+                key: 'Attendance1',
+                icon: renderIcon(PersonIcon),
+                routerLink: '/signRecord'
+              },
+              {
+                label: '考勤记录',
+                key: 'Attendance2-man',
+                icon: renderIcon(PersonIcon),
+                routerLink: 'attendanceRecord'
+              },
+              {
+                label: '考勤制度',
+                key: 'Attendance3-man',
+                icon: renderIcon(PersonIcon),
+                routerLink: '/attendanceInstitution'
+              },
+        ]
+      },
+      {
+        label: '任务管理',
+        key: 'task',
+        icon: renderIcon(PersonOutline),
+        routerLink: '/task'
+      },
+      {
+        label: '出差管理',
+        key: 'out',
+        routerLink: '/workout',    
+        icon: renderIcon(BookIcon)
+      }
 ]
     console.log()
     const currentMenu = ref()
+    const currentName = ref()
     const $router = useRouter()
-    const handleUpdateMenu:(age:any,arg2:any) => void = (args:any,currentItem:any) => {    
+    const handleUpdateMenu:(age:string,arg2:any) => void = (args:string,currentItem:any) => {    
     $router.push(currentItem.routerLink)
     currentMenu.value = args
+    currentName.value = currentItem.label
   }
     return {
       inverted: ref(false),
       menuOptions,
       darkTheme,
       currentMenu,
+      currentName,
       theme: ref(true),
       handleUpdateMenu,
       title: process.env.VUE_APP_TITLE
