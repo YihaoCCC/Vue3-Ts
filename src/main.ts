@@ -5,8 +5,8 @@ import router from './router'
 import store from "./store";
 import ckHttp from "./service";
 import  setNavieUiComponents from "./plugins/navieui";
-
-
+import { useElementPlus } from "./plugins/elementplus";
+//import 'element-plus/dist/index.css'
 import 'animate.css';
 
 // 测试axios
@@ -32,7 +32,7 @@ app.config.globalProperties.isAuth = function (tag:number) {
 }
 
 setNavieUiComponents(app)
-
+useElementPlus(app)
 app.use(router)
 app.use(store)
 app.mount("#app");

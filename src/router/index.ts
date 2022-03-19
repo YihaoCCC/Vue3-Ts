@@ -17,6 +17,98 @@ const routes: RouteRecordRaw[]= [
                 path: '/profile',
                 name: 'profile',
                 component: () => import('../pages/profile/profile.vue')
+            },
+            {
+                path: '/department',
+                name: 'department',
+                component: () => import('../pages/department/department.vue')
+            },
+            {
+                path: '/user',
+                name: 'user',
+                component: () => import('../pages/user/user.vue')
+             },
+             {
+                 path: '/recordAward',
+                 name: 'recordAward',
+                 component: () => import('../pages/award/recordAward.vue')
+             },
+             {
+                 path: '/institution',
+                 name: 'institution',
+                 component: () => import('../pages/award/institution.vue')
+             },
+             {
+                 path: '/leave',
+                 name: 'leave',
+                 component: () => import('../pages/leave/leave.vue')
+             },
+             {
+                path: '/leaveRequest',
+                name: 'leaveRequest',
+                component: () => import('../pages/leave/leaveRequest.vue')
+            },
+             {
+                 path: '/message',
+                 name: 'message',
+                 component:() => import('../pages/message/message.vue')
+             },
+             {
+                 path: '/position',
+                 name: 'position',
+                 component: () => import('../pages/position/position.vue')
+             },
+             {
+                 path: '/moneyRecord',
+                 name: 'moneyRecord',
+                 component: ( ) => import ('../pages/money/moneyRecord.vue')
+        
+             },
+             {
+                 path: '/moneyInstitution',
+                 name: 'moneyInstitution',
+                 component: () => import('../pages/money/moneyInstitution.vue')
+             },
+             {
+                path: '/compute',
+                name: 'compute',
+                component: () => import('../pages/money/compute.vue')
+            },
+             {
+                 path: '/signRecord',
+                 name: 'signRecord',
+                 component: () => import('../pages/attendance/signRecord.vue')
+             },
+             {
+                path: '/attendanceRecord',
+                name: 'attendanceRecord',
+                component: () => import('../pages/attendance/attendanceRecord.vue')
+            },
+            {
+                path: '/attendanceInstitution',
+                name: 'attendanceInstitution',
+                component: () => import('../pages/attendance/attendanceInstitution.vue')
+            },
+            {
+                path: '/task',
+                name: 'task',
+                component: () => import('../pages/task/task.vue')
+            },
+            {
+                path: '/taskSubmit',
+                name: 'taskSubmit',
+                component: () => import('../pages/task/taskSubmit.vue')
+            },
+            {
+                path: '/workout',
+                name: 'workout',
+                component: () => import('../pages/workout/workout.vue')
+            },
+            { 
+                path: '/workoutRequest',
+                name: 'workoutRequest',
+                component: () => import('../pages/workout/workoutRequest.vue')  
+
             }
         ]
     },

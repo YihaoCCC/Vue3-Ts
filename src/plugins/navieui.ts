@@ -18,7 +18,11 @@ import {
   NDropdown,
   NPopover,
   NInput,
-  NIcon
+  NIcon,
+  NMessageProvider,
+  NDataTable,
+  NDrawer,
+  NDrawerContent,
 } from 'naive-ui'
 
 
@@ -41,7 +45,11 @@ function setNavieUiComponents(app: {use:(naive:any) => void}):void {
             NDropdown,
             NPopover,
             NInput,
-            NIcon
+            NIcon,
+            NMessageProvider,
+            NDataTable,
+            NDrawer,
+            NDrawerContent,
         ]
       })
       app.use(naive)
