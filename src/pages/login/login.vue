@@ -29,12 +29,6 @@
                             登录
                         </n-button>
                     </div>
-                    <ul>
-                        <li value='1'>用户修改</li>
-                        <li >部门管理</li>
-                        <li></li>
-                        <li></li>
-                    </ul>
                 </div>
             </div>
             <div class="footer">
@@ -45,14 +39,15 @@
     
 <script  lang='ts'>
 
-import { reactive, getCurrentInstance } from "vue";
+import { reactive } from "vue";
 import { BagRemoveOutline, PersonOutline } from '@vicons/ionicons5'
 import { useRouter } from 'vue-router'
+
+import ckHttp from '@/service'
 export default {
     
     setup() {
-        const context = getCurrentInstance()
-        const $ckHttp = context?.appContext.config.globalProperties.$ckHttp
+    
         const formValue = reactive({
             username :'',
             password: ''
@@ -71,6 +66,9 @@ export default {
             BagRemoveOutline,
             PersonOutline,
             login() {
+                ckHttp.getInstance().get(`/api/user/login/${formValue.username}&${formValue.password}`).then((res) => {
+                    console.log(res)
+                })
                 //在浏览器的storage中存储用户权限列表，这样其他页面也可使用storage中的数据，实现共享
                         // let permissions = resp.permissions;
                         // //取出Token令牌，保存到storage中
@@ -79,9 +77,7 @@ export default {
                         // localStorage.setItem('token', token);
                         // //让路由跳转页面，这里的Home是home.vue页面的名字
                         // /user/login/{userId}&{password}
-                $ckHttp.get(`/api/user/login/${formValue.username}&${formValue.password}`).then((res:any) => {
-                    console.log(res)
-                })
+              
                 console.log(formValue.username+formValue.password)
                 router.push('/home');
 

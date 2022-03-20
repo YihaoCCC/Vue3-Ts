@@ -11,9 +11,6 @@
       <n-button tertiary type="primary" @click="activate">
           添加系统公告
       </n-button>
-      <n-button tertiary type="primary" @click="activate">
-          添加部门公告
-      </n-button>
     </template>
     <n-data-table
       :bordered="false"
@@ -56,35 +53,6 @@ const createColumns = ({ sendMail }) => {
     {
       title: '发布人姓名',
       key: 'name'
-    },
-    {
-      title: '公告类型',
-      key: 'type'
-    },
-    // {
-    //   title: '公告类型',
-    //   key: 'tags',
-    //   render (row) {
-    //     const tags = row.tags.map((tagKey) => {
-    //       return h(
-    //         NTag,
-    //         {
-    //           style: {
-    //             marginRight: '6px'
-    //           },
-    //           type: 'info'
-    //         },
-    //         {
-    //           default: () => tagKey
-    //         }
-    //       )
-    //     })
-    //     return tags
-    //   }
-    // }
-    {
-      title: '部门',
-      key: 'department.name'
     },
     {
       title: '发布时间',

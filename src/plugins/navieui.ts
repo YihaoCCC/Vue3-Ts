@@ -23,6 +23,13 @@ import {
   NDataTable,
   NDrawer,
   NDrawerContent,
+  NForm,
+  NFormItem,
+  NSelect,
+  NDatePicker,
+  NRadioGroup,
+  NRadio,
+  NInputNumber,
 } from 'naive-ui'
 
 
@@ -50,6 +57,13 @@ function setNavieUiComponents(app: {use:(naive:any) => void}):void {
             NDataTable,
             NDrawer,
             NDrawerContent,
+            NForm,
+            NFormItem,
+            NSelect,
+            NDatePicker,
+            NRadioGroup,
+            NRadio,
+            NInputNumber,
         ]
       })
       app.use(naive)

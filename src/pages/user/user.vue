@@ -8,7 +8,7 @@
       hoverable
   >
     <template #header-extra>
-      <n-button tertiary type="primary" @click="activate">
+      <n-button tertiary type="primary" @click="handleActivate(0)">
           添加员工
       </n-button>
     </template>
@@ -18,11 +18,82 @@
       :data="data"
       :pagination="pagination"
     />
-    <n-drawer v-model:show="active" :width="502">
+    <n-drawer v-model:show="active" :width="602">
       <n-drawer-content>
         <template #header>
-          Header
+          员工信息
         </template>
+        <n-form inline >
+          <n-form-item label='用户姓名' >
+            <n-input placeholder="用户姓名"  v-model:value="form.name" >
+
+            </n-input>
+          </n-form-item>
+          <n-form-item label='用户性别'>
+            <n-radio-group v-model:value="form.sex" name="radiogroup">
+              <n-radio value="1">男 </n-radio>
+              <n-radio value='2'>女</n-radio>
+            </n-radio-group>
+          </n-form-item>
+          
+        </n-form>
+        <n-form-item label='出生日期' >
+            <n-date-picker
+              size="medium" type="date"
+              placeholder="请选择出生日期"
+              v-model:formatted-value="form.birthday"
+              value-format="yyyy-MM-dd"
+              clearable
+            />
+          </n-form-item>
+        <n-form inline >
+            <n-form-item label='身份证号' >
+              <n-input-number placeholder="请输入身份证号" type='textarea' v-model:value="form.idNumber">
+
+              </n-input-number>
+            </n-form-item>
+            <n-form-item label='邮箱' >
+              <n-input placeholder="请输入邮箱"  v-model:value="form.email">
+
+              </n-input>
+            </n-form-item>
+        </n-form>
+        <n-form>
+          <n-form-item label='住址' >
+            <n-input placeholder="请输入住址"  v-model:value="form.nativePlace">
+
+            </n-input>
+          </n-form-item>
+          <n-form-item label='手机号' >
+            <n-input placeholder="请输入手机号" v-model:value="form.phone">
+
+            </n-input>
+          </n-form-item>
+          <n-form-item label='入职日期' >
+            <n-date-picker
+              placeholder="请选择入职日期"
+              v-model:formatted-value="form.beginDate"
+              value-format="yyyy-MM-dd"
+              type="date"
+              clearable
+            />
+          </n-form-item>
+        </n-form>
+        <n-form> 
+          <n-form-item label='所在部门' >
+            <n-select placeholder="请选择所在部门" v-model:value="form.department">
+
+            </n-select>
+          </n-form-item>
+          <n-form-item label='职位' >
+            <n-select placeholder="请选择职位" type='textarea' v-model:value="form.position.name">
+
+            </n-select>
+          </n-form-item>
+        </n-form>
+        <n-button @click="addOrUpdataUser" type="primary">
+          {{!actionType ? '添加该用户' : '修改该用户'}}
+        </n-button>
         <template #footer>
           <n-button>Footer</n-button>
         </template>
@@ -37,10 +108,10 @@
 //添加员工  Post   /user/add       json{password，name，sex，birthday，idNumber，email，nativePlace，address，phone，departmentId，positionId}
 //修改  Put    /user/update    json{userId,password，name，sex，birthday，idNumber，email，nativePlace，address，phone，departmentId，positionId}
 //删除  Put  /user/delete/{userId}
-import { h, defineComponent, ref } from 'vue'
+import { h, defineComponent, ref, onMounted } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
-const createColumns = ({ sendMail }) => {
+const createColumns = ({ handleActivate, deleteUser }) => {
   return [
     {
       title: '员工号',
@@ -103,7 +174,7 @@ const createColumns = ({ sendMail }) => {
                             marginRight: '6px'
                         },
                         size: 'small',
-                        onClick: () => sendMail(row)
+                        onClick: () => handleActivate(1,row)
                     },
                     
                     { default: () => '修改' }
@@ -119,7 +190,7 @@ const createColumns = ({ sendMail }) => {
                                 },
                                 
                                 size: 'small',
-                                onClick: () => sendMail(row)
+                                onClick: () => deleteUser(row.userId)
                             },
                             
                             { default: () => '删除' }
@@ -137,12 +208,12 @@ const createData = () => [
     userId: "180101",
     name: 'John Brown',
     sex: "1",
-    birthday: "1999-06-15",
+    birthday: "2000-11-22",
     idNumber: "1231",
     email: "sss",
     nativePlace: null,
     address: null,
-    phone: "sss",
+    phone: "16622903269",
     beginDate: "2000-11-22",
     department:{
       id: 1,
@@ -175,45 +246,87 @@ const createData = () => [
       departmentId: 1,
       menu: "1",
     }
-  },
-  {
-    userId: "180103",
-    name: 'John Brown',
-    sex: "1",
-    birthday: "1999-06-15",
-    idNumber: "1231",
-    email: "sss",
-    nativePlace: null,
-    address: null,
-    phone: "sss",
-    beginDate: "2000-11-22",
-    department:{
-      id: 1,
-      name: "人事部",
-      email: "1",
-      describe: "1",
-    },
-    position:{
-      id: 1,
-      name: "人事经理",
-      departmentId: 1,
-      menu: "1",
-    }
-  },
+  }
 ]
-
+import  { HTTPGetUser, HTTPAddUser, HTTPUpdataUser , HTTPDeleteUser }from './HttpUser'
 export default defineComponent({
   setup () {
     const message = useMessage()
     const active = ref(false)
-    const activate = () => {
+    const actionType = ref(0) // 0增加 1修改
+    const form = ref({
+        name: '',
+        sex: "",
+        birthday: null,
+        idNumber: "1231",
+        email: "sss",
+        nativePlace: null,
+        address: null,
+        phone: "sss",
+        beginDate: null,
+        department:null,
+        position:{
+          id: 1,
+          name: "人事经理",
+          departmentId: 1,
+          menu: "1",
+      }
+    })
+    onMounted(() => {
+      getUser()
+    })
+    const getUser = () => {
+        let id = 1
+        HTTPGetUser(id)
+    }
+    const addOrUpdataUser = () => {
+      if( !actionType.value ) {
+        HTTPAddUser(form.value)
+      } else {
+        HTTPUpdataUser(form.value)
+      }
+    }
+    const deleteUser = (id) => {
+      HTTPDeleteUser(id)
+    }
+    const handleActivate= (type, item) => {
       active.value = true
+      if( type ) {
+        form.value = item
+        actionType.value = 1
+      } else {
+        form.value = {
+            name: '',
+            sex: "",
+            birthday: null,
+            idNumber: "",
+            email: "",
+            nativePlace: null,
+            address: null,
+            phone: "",
+            beginDate: null,
+            department:null,
+            position:{
+              id: 1,
+              name: "人事经理",
+              departmentId: 1,
+              menu: "1",
+          }
+        }
+        actionType.value = 0
+      } 
     }
     return {
       active,
-      activate,
+      actionType,
+      form,
+      handleActivate,
+      addOrUpdataUser,
+      deleteUser,
       data: createData(),
       columns: createColumns({
+        handleActivate,
+        deleteUser,
         sendMail (rowData) {
           message.info('send mail to ' + rowData.name)
         }

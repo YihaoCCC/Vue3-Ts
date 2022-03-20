@@ -10,10 +10,11 @@ import { useElementPlus } from "./plugins/elementplus";
 import 'animate.css';
 
 // 测试axios
-ckHttp.testHttp()
+// ckHttp.testHttp()
 const app = createApp(App)
 
-app.config.globalProperties.$ckHttp = ckHttp
+// 取消全局挂载，在CKhttp的实例中写一个 getinstance的方法把axios实例返回出去，供外部调用get等方法
+// app.config.globalProperties.$ckHttp = ckHttp
 
 app.config.globalProperties.isAuth = function (tag:number) {
     let flag = true

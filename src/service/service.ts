@@ -21,9 +21,8 @@ class CKhttp {
         }
         )
     }
-    
-    testHttp() {
-        this.instance.get('/get').then(res => console.log(res))
+    getInstance() {
+        return this.instance
     }
 }
 

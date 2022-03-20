@@ -105,7 +105,6 @@ export default defineComponent({
   },
   created() {
       this.currentMenu= this.$route.name
-      console.log(this.$route.name)
       console.log(this.currentMenu)
   },
   setup () {
@@ -134,14 +133,8 @@ export default defineComponent({
         routerLink: '/department'
       },
       {
-        label: '职位管理',
-        key: 'a-wild-sheep-chase',
-        routerLink: '/position',    
-        icon: renderIcon(BookIcon)
-      },
-      {
         label: '员工管理',
-        key: 'User',
+        key: 'user',
         icon: renderIcon(PersonOutline),
         routerLink: '/user'
       },
@@ -152,14 +145,14 @@ export default defineComponent({
         children: [
           {
             label: '奖惩记录',
-            key: 'rat',
+            key: 'recordAward',
             icon: renderIcon(RibbonOutline),
             routerLink: '/recordAward',
             disabled: $isAuth('USER:UPDATE')
           },
           {
             label: '奖惩制度',
-            key: 'rat2',
+            key: 'institution',
             icon: renderIcon(RibbonOutline),
             routerLink: '/institution',
             disabled: $isAuth('USER:UPDATE')
@@ -173,13 +166,13 @@ export default defineComponent({
         children: [
           {
             label: '请假记录',
-            key: '/leave',
+            key: 'leave',
             icon: renderIcon(PersonOutline),
             routerLink: '/leave',
           },
           {
             label: '请假审批',
-            key: '/leaveRequest',
+            key: 'leaveRequest',
             icon: renderIcon(PersonOutline),
             routerLink: '/leaveRequest',
           }
@@ -192,14 +185,14 @@ export default defineComponent({
         children: [
           {
             label: '出差记录',
-            key: 'out1',
+            key: 'workout',
             icon: renderIcon(BookIcon),
             routerLink: '/workout',    
             
           },
           {
             label: '出差审批',
-            key: 'out2',
+            key: 'workoutRequest',
             icon: renderIcon(BookIcon),
             routerLink: '/workoutRequest',    
             
@@ -219,21 +212,21 @@ export default defineComponent({
         children: [
           {
             label: '薪资记录',
-            key: 'money1',
+            key: 'moneyRecord',
             icon: renderIcon(BookIcon),
             routerLink: '/moneyRecord',
             disabled: $isAuth('USER:UPDATE')
           },
           {
             label: '薪资制度',
-            key: 'money2',
+            key: 'moneyInstitution',
             icon: renderIcon(BookIcon),
             routerLink: '/moneyInstitution',
             disabled: $isAuth('USER:UPDATE')
           },
           {
             label: '计算薪资',
-            key: 'money3',
+            key: 'compute',
             icon: renderIcon(BookIcon),
             routerLink: '/compute',
             disabled: $isAuth('USER:UPDATE')
@@ -247,13 +240,13 @@ export default defineComponent({
         children: [
               {
                 label: '考勤记录',
-                key: 'Attendance1',
+                key: 'attendanceRecord',
                 icon: renderIcon(BookIcon),
                 routerLink: '/signRecord'
               },
               {
                 label: '考勤类型制度',
-                key: 'Attendance2-man',
+                key: 'attendanceInstitution',
                 icon: renderIcon(BookIcon),
                 routerLink: 'attendanceRecord'
               },
@@ -272,18 +265,24 @@ export default defineComponent({
         children: [
               {
                 label: '任务记录',
-                key: 'task1',
+                key: 'task',
                 icon: renderIcon(BookIcon),
                 routerLink: '/task'
               },
               {
                 label: '我的任务提交',
-                key: 'task2',
+                key: 'taskSubmit',
                 icon: renderIcon(BookIcon),
                 routerLink: '/taskSubmit'
               }
         ]
-      }
+      },
+      {
+        label: '职位管理',
+        key: 'position',
+        routerLink: '/position',    
+        icon: renderIcon(BookIcon)
+      },
 ]
     console.log()
     const currentMenu = ref()

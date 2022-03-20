@@ -1,5 +1,5 @@
 <template>
-  <n-dropdown :options="options">
+  <n-dropdown :options="options" @select="handleSelect">
     <div class="avatar">
         <n-avatar
             round
@@ -17,13 +17,13 @@
 <script lang="ts">
 import { h, defineComponent } from 'vue'
 import type { Component } from 'vue'
-import { NIcon } from 'naive-ui'
+import { NIcon} from 'naive-ui'
 import {
   PersonCircleOutline as UserIcon,
   Pencil as EditIcon,
   LogOutOutline as LogoutIcon
 } from '@vicons/ionicons5'
-
+import {useRouter} from 'vue-router'
 const renderIcon = (icon: Component) => {
   return () => {
     return h(NIcon, null, {
@@ -34,6 +34,7 @@ const renderIcon = (icon: Component) => {
 
 export default defineComponent({
   setup () {
+    const router = useRouter()
     return {
       options: [
         {
@@ -51,7 +52,12 @@ export default defineComponent({
           key: 'logout',
           icon: renderIcon(LogoutIcon)
         }
-      ]
+      ],
+      handleSelect (key: string | number) {
+        if ( key === 'logout') {
+          router.push('/login')
+        }
+      }
     }
   }
 })
