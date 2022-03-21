@@ -8,7 +8,7 @@
     hoverable
   >
     <template #header-extra>
-      <n-button tertiary type="primary" @click="activate">
+      <n-button tertiary type="primary" @click="handleActivate()">
           添加奖惩记录
       </n-button>
     </template>
@@ -21,11 +21,23 @@
     <n-drawer v-model:show="active" :width="502">
       <n-drawer-content>
         <template #header>
-          Header
+          奖惩记录信息
         </template>
-        <template #footer>
-          <n-button>Footer</n-button>
-        </template>
+        <n-form> 
+          <n-form-item label='员工姓名' >
+            <n-select placeholder="请选择员工" v-model:value="form.userId" :options="userOptions">
+
+            </n-select>
+          </n-form-item>
+          <n-form-item label='奖惩名' >
+            <n-select placeholder="请选择奖惩名" v-model:value="form.jiangchengId" :options="institutionOptions">
+
+            </n-select>
+          </n-form-item>
+        </n-form>
+        <n-button @click="addRecordAward" type="primary">
+          添加
+        </n-button>
       </n-drawer-content>
     </n-drawer>
   </n-card>
@@ -33,12 +45,10 @@
 </template>
 
 <script>
-//表格中的数据  Get请求     /jiangcheng/query/{userId}&{pageNum}
-//添加  Post   /user/add       json{userId,jiangchengId}
-import { h, defineComponent, ref } from 'vue'
+import { h, defineComponent, ref,  onMounted } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
-const createColumns = ({ sendMail }) => {
+const createColumns = () => {
   return [
     {
       title: '员工号',
@@ -88,45 +98,66 @@ const createColumns = ({ sendMail }) => {
   ]
 }
 
-const createData = () => [
-  {
-    id: 0,
-    userId: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer']
-  },
-  {
-    id: 1,
-    userId: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['wow']
-  },
-  {
-    id: 2,
-    userId: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher']
-  }
-]
-
+import {HTTPGetRecordAward, HTTPAddRecordAward} from './HttpMethods'
 export default defineComponent({
   setup () {
-    const message = useMessage()
     const active = ref(false)
-    const activate = () => {
+    let form = ref({
+          userId: '',
+          jiangchengId: ''
+    })
+    const data = ref([])
+    const userOptions = ref([])
+    const institutionOptions = ref([])
+    onMounted(() => {
+      getRecordAward()
+      getOptions()
+    })
+    const getOptions = () => {
+      // HTTPGetDepartment().then(res =>{
+      //   res.forEach(element => {
+      //     departmentOptions.value.push({
+      //       value: element.id,
+      //       lable: element.name
+      //       })
+      //     });
+      // })
+      // HTTPGetPosition().then( res =>{
+      //   res.forEach(element => {
+      //     positionOptions.value.push({
+      //       value: element.id,
+      //       lable: element.name
+      //       })
+      //     });
+      // })
+    }
+    //表格中的数据  Get请求     /jiangcheng/query/{userId}
+    const getRecordAward = () => {
+      HTTPGetRecordAward().then(res => {
+        data.value = res
+      })
+    }
+    //添加  Post   /user/add       json{userId,jiangchengId}
+    const addRecordAward = () => {
+      HTTPAddRecordAward(form.value).then(res =>{
+          if(res.code === 200){
+            getRecordAward()
+          }
+      })
+      active.value = false
+    }
+    const handleActivate= (type, item) => {
       active.value = true
     }
     return {
+      form,
+      userOptions,
+      institutionOptions,
+      addRecordAward,
+      handleActivate,
       active,
-      activate,
-      data: createData(),
+      data,
       columns: createColumns({
-        sendMail (rowData) {
-          message.info('send mail to ' + rowData.name)
-        }
       }),
       pagination: {
         pageSize: 10

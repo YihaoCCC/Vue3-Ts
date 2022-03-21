@@ -55,6 +55,7 @@ export default defineComponent({
       ],
       handleSelect (key: string | number) {
         if ( key === 'logout') {
+          localStorage.clear()
           router.push('/login')
         }
       }

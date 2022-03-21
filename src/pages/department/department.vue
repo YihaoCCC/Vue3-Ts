@@ -43,9 +43,6 @@
         <n-button @click="addDepartment" type="primary">
           {{!actionType ? '添加该部门' : '修改该部门'}}
         </n-button>
-        <template #footer>
-          <n-button>Footer</n-button>
-        </template>
       </n-drawer-content>
     </n-drawer>
   </n-card>
@@ -71,7 +68,7 @@ const createColumns = ({ handleActivate,deleteDepartment }) => {
       key: 'describe'
     },
     {
-      title: 'Action',
+      title: '操作',
       key: 'actions',
       render (row) {
         const button = [1,2].map((item) => {
@@ -112,110 +109,52 @@ const createColumns = ({ handleActivate,deleteDepartment }) => {
   ]
 }
 
-const createData = () => [
-  {
-    id: 0,
-    name: 'John Brown',
-    email: 32,
-    describe: 'New York No. 1 Lake Park',
-  },
-  {
-    id: 1,
-    name: 'Jim Green',
-    email: 42,
-    describe: 'London No. 1 Lake Park',
-  },
-  {
-    id: 2,
-    name: 'Joe Black',
-    email: 32,
-    describe: 'Sidney No. 1 Lake Park',
-  }
-  ,
-  {
-    id: 3,
-    name: 'Joe Black',
-    email: 32,
-    describe: 'Sidney No. 1 Lake Park',
-  }
-  ,
-  {
-    id: 4,
-    name: 'Joe Black',
-    email: 32,
-    describe: 'Sidney No. 1 Lake Park',
-  }
-  ,
-  {
-    id: 5,
-    name: 'Joe Black',
-    email: 32,
-    describe: 'Sidney No. 1 Lake Park',
-  }
-  ,
-  {
-    id: 6,
-    name: 'Joe Black',
-    email: 32,
-    describe: 'Sidney No. 1 Lake Park',
-  },
-  {
-    id: 2,
-    name: 'Joe Black',
-    email: 32,
-    describe: 'Sidney No. 1 Lake Park',
-  },
-  {
-    id: 2,
-    name: 'Joe Black',
-    email: 32,
-    describe: 'Sidney No. 1 Lake Park',
-  },
-  {
-    id: 2,
-    name: 'Joe Black',
-    email: 32,
-    describe: 'Sidney No. 1 Lake Park',
-  },
-  {
-    id: 2,
-    name: 'Joe Black',
-    email: 32,
-    describe: 'Sidney No. 1 Lake Park',
-  }
-]
+
 import {HTTPGetDepartment, HTTPAddDepartMent, HTTPUpdataDepartMent, HTTPDeleteDepartment} from './HttpMethods'
 export default defineComponent({
-  
   setup () {
-    const message = useMessage()
     const active = ref(false)
     let form = ref({
           name: '',
           email: '',
           describe: ''
     })
-
+    const data = ref([])
     onMounted(() => {
       getDepartment()
     })
     const actionType = ref(0)  // 0代表增加，1代表修改
     //表格中的数据  Get请求 /department/queryAll/{pageNum}
     const getDepartment = () => {
-      HTTPGetDepartment().then(res => console.log(res))
+      HTTPGetDepartment().then(res => {
+        data.value = res
+      })
     }
     //添加部门  Post   /department/add       json{name，email，describe}
     //修改部门  Put    /department/update    json{id,name，email，describe}
     const addDepartment = () => {
       if( !actionType.value ) {
-        HTTPAddDepartMent(form.value)
+        HTTPAddDepartMent(form.value).then(res =>{
+          if(res.code === 200){
+            getDepartment()
+          }
+        })
       } else {
-        HTTPUpdataDepartMent(form.value)
+        HTTPUpdataDepartMent(form.value).then(res =>{
+          if(res.code === 200){
+            getDepartment()
+          }
+        })
       }
+      active.value = false
     }
     //删除部门  Delete  /department/delete/{id}
     const deleteDepartment = (id) => {
-      HTTPDeleteDepartment(id)
+      HTTPDeleteDepartment(id).then(res =>{
+          if(res.code === 200){
+            getDepartment()
+          }
+        })
     }
     const handleActivate= (type, item) => {
       active.value = true
@@ -238,7 +177,7 @@ export default defineComponent({
       deleteDepartment,
       active,
       handleActivate,
-      data: createData(),
+      data,
       columns: createColumns({
         handleActivate,
         deleteDepartment

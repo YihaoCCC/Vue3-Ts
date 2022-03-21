@@ -31,8 +31,8 @@
           </n-form-item>
           <n-form-item label='用户性别'>
             <n-radio-group v-model:value="form.sex" name="radiogroup">
-              <n-radio value="1">男 </n-radio>
-              <n-radio value='2'>女</n-radio>
+              <n-radio value="男">男 </n-radio>
+              <n-radio value='女'>女</n-radio>
             </n-radio-group>
           </n-form-item>
           
@@ -46,11 +46,10 @@
               clearable
             />
           </n-form-item>
-        <n-form inline >
+        <n-form >
             <n-form-item label='身份证号' >
-              <n-input-number placeholder="请输入身份证号" type='textarea' v-model:value="form.idNumber">
-
-              </n-input-number>
+              <n-input placeholder="请输入身份证号"  v-model:value="form.idNumber">
+              </n-input>
             </n-form-item>
             <n-form-item label='邮箱' >
               <n-input placeholder="请输入邮箱"  v-model:value="form.email">
@@ -61,7 +60,6 @@
         <n-form>
           <n-form-item label='住址' >
             <n-input placeholder="请输入住址"  v-model:value="form.nativePlace">
-
             </n-input>
           </n-form-item>
           <n-form-item label='手机号' >
@@ -81,12 +79,12 @@
         </n-form>
         <n-form> 
           <n-form-item label='所在部门' >
-            <n-select placeholder="请选择所在部门" v-model:value="form.department">
+            <n-select placeholder="请选择所在部门"  :options="departmentOptions">
 
             </n-select>
           </n-form-item>
           <n-form-item label='职位' >
-            <n-select placeholder="请选择职位" type='textarea' v-model:value="form.position.name">
+            <n-select placeholder="请选择职位" v-model:value="form.positionId" :options="positionOptions">
 
             </n-select>
           </n-form-item>
@@ -203,85 +201,64 @@ const createColumns = ({ handleActivate, deleteUser }) => {
   ]
 }
 
-const createData = () => [
-  {
-    userId: "180101",
-    name: 'John Brown',
-    sex: "1",
-    birthday: "2000-11-22",
-    idNumber: "1231",
-    email: "sss",
-    nativePlace: null,
-    address: null,
-    phone: "16622903269",
-    beginDate: "2000-11-22",
-    department:{
-      id: 1,
-      name: "人事部",
-      email: "1",
-      describe: "1",
-    },
-    position:{
-      id: 1,
-      name: "人事经理",
-      departmentId: 1,
-      menu: "1",
-    }
-  },
-  {
-    userId: "180102",
-    name: 'John Brown',
-    sex: "1",
-    birthday: "1999-06-15",
-    idNumber: "1231",
-    email: "sss",
-    nativePlace: null,
-    address: null,
-    phone: "sss",
-    beginDate: "2000-11-22",
-    department:null,
-    position:{
-      id: 1,
-      name: "人事经理",
-      departmentId: 1,
-      menu: "1",
-    }
-  }
-]
-import  { HTTPGetUser, HTTPAddUser, HTTPUpdataUser , HTTPDeleteUser }from './HttpUser'
+
+import  { HTTPGetUser, HTTPAddUser, HTTPUpdataUser , HTTPDeleteUser, HTTPGetDepartment, HTTPGetPosition }from './HttpUser'
 export default defineComponent({
   setup () {
     const message = useMessage()
     const active = ref(false)
     const actionType = ref(0) // 0增加 1修改
+    const data = ref([])
+    const departmentOptions = ref([])
+    const positionOptions = ref([])
     const form = ref({
         name: '',
-        sex: "",
+        sex: '',
         birthday: null,
-        idNumber: "1231",
-        email: "sss",
+        idNumber: '',
+        email: '',
         nativePlace: null,
         address: null,
-        phone: "sss",
+        phone: '',
         beginDate: null,
-        department:null,
-        position:{
-          id: 1,
-          name: "人事经理",
-          departmentId: 1,
-          menu: "1",
-      }
+        departmentId:null,
+        positionId:''
     })
     onMounted(() => {
       getUser()
+      getOptions()
     })
+    const getOptions = () => {
+      HTTPGetDepartment().then(res =>{
+        res.forEach(element => {
+          departmentOptions.value.push({
+            value: element.id,
+            lable: element.name
+            })
+          });
+      })
+      HTTPGetPosition().then( res =>{
+        res.forEach(element => {
+          positionOptions.value.push({
+            value: element.id,
+            lable: element.name
+            })
+          });
+      })
+    }
     const getUser = () => {
-        let id = 1
-        HTTPGetUser(id)
+        let id = localStorage.getItem("USERID")
+        HTTPGetUser(id).then(res => {
+          data.value = res
+        })
     }
     const addOrUpdataUser = () => {
       if( !actionType.value ) {
-        HTTPAddUser(form.value)
+        HTTPAddUser(form.value).then(res =>{
+          if(res.code === 200){
+            getUser()
+          }
+        })
       } else {
         HTTPUpdataUser(form.value)
       }
@@ -293,25 +270,21 @@ export default defineComponent({
       active.value = true
       if( type ) {
         form.value = item
+        console.log(form.value)
         actionType.value = 1
       } else {
         form.value = {
             name: '',
-            sex: "",
+            sex: '',
             birthday: null,
-            idNumber: "",
-            email: "",
+            idNumber: '',
+            email: '',
             nativePlace: null,
             address: null,
-            phone: "",
+            phone: '',
             beginDate: null,
-            department:null,
-            position:{
-              id: 1,
-              name: "人事经理",
-              departmentId: 1,
-              menu: "1",
-          }
+            departmentId:null,
+            positionId:''
         }
         actionType.value = 0
       } 
@@ -320,10 +293,12 @@ export default defineComponent({
       active,
       actionType,
       form,
+      departmentOptions,
+      positionOptions,
       handleActivate,
       addOrUpdataUser,
       deleteUser,
-      data: createData(),
+      data,
       columns: createColumns({
         handleActivate,
         deleteUser,
