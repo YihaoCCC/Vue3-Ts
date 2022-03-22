@@ -18,11 +18,11 @@
 </template>
 
 <script>
-//表格数据  GET     /salary/query/{userId}&{pageNum}
-import { h, defineComponent } from 'vue'
+//表格数据  GET     /salary/query/{userId}
+import { h, defineComponent, ref, onMounted } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
-const createColumns = ({ sendMail }) => {
+const createColumns = () => {
   return [
     {
       title: '员工号',
@@ -71,39 +71,23 @@ const createColumns = ({ sendMail }) => {
   ]
 }
 
-const createData = () => [
-  {
-    key: 0,
-    userId: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer']
-  },
-  {
-    key: 1,
-    userId: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['wow']
-  },
-  {
-    key: 2,
-    userId: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher']
-  }
-]
-
+import {HTTPGetMoneyRecord} from './HttpMethods'
 export default defineComponent({
   setup () {
-    const message = useMessage()
+    const data = ref([])
+    onMounted(() => {
+      getMoneyRecord()
+    })
+    //表格中的数据
+    const getMoneyRecord = () => {
+      let id = localStorage.getItem("USERID")
+      HTTPGetMoneyRecord(id).then(res => {
+        data.value = res
+      })
+    }
     return {
-      data: createData(),
+      data,
       columns: createColumns({
-        sendMail (rowData) {
-          message.info('send mail to ' + rowData.name)
-        }
       }),
       pagination: {
         pageSize: 10

@@ -24,20 +24,18 @@ function publicMethod(path:string, type:string, data?:any) {
     }
     return result
 }
-export function HTTPGetRecordAward(id:string) {
-    return  publicMethod(`/api/jiangcheng/query/${id}`, 'get') 
+export function HTTPGetSignRecord(id:string) {
+    return  publicMethod(`/api/signIn/query/${id}`, 'get')
 }
-export function HTTPAddRecordAward(data:any) {
-    return publicMethod('/api/jiangcheng/add', 'post', data)
+export function HTTPGetAttendanceType() {
+    return  publicMethod('/api/signinSystem/queryAll', 'get')
 }
-export function HTTPGetInstitution() {
-    return  publicMethod('/api/jiangchengSystem/queryAll', 'get') 
+export function HTTPUpdAtaattendanceType(data:any) {
+    return publicMethod('/api/signinSystem/update','put',data)
 }
-export function HTTPAddInstitution(data:any) {
-    return publicMethod('/api/jiangchengSystem/add', 'post', data)
+export function HTTPGetAttendanceTime() {
+    return  publicMethod('/api/workTime/queryAll', 'get')
 }
-export function HTTPUpdataInstitution(data:any) {
-    return publicMethod('/api/jiangchengSystem/update','put',data)
+export function HTTPUpdAtaattendanceTime(data:any) {
+    return publicMethod('/api/workTime/update','put',data)
 }
-
-

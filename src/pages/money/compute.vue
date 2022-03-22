@@ -11,12 +11,12 @@
 </template>
 
 <script>
-//表格中的数据  Get请求 /department/queryAll/{pageNum}
+//表格中的数据  Get请求 /department/queryAll
 //计算薪资  Get    /salary/computeByDepartmentId/{departmentId}
-import { h, defineComponent } from 'vue'
+import { h, defineComponent, ref, onMounted } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
-const createColumns = ({ sendMail }) => {
+const createColumns = ({ compute }) => {
   return [
     {
       title: '部门名称',
@@ -31,10 +31,10 @@ const createColumns = ({ sendMail }) => {
       key: 'describe'
     },
     {
-      title: 'Action',
+      title: '操作',
       key: 'actions',
       render (row) {
-        const button = [1,2].map((item) => {
+        const button = [1].map((item) => {
             if(item === 1) {
                 return h(
                     NButton,
@@ -43,28 +43,12 @@ const createColumns = ({ sendMail }) => {
                             marginRight: '6px'
                         },
                         size: 'small',
-                        onClick: () => sendMail(row)
+                        onClick: () => compute(row.id)
                     },
                     
                     { default: () => '计算薪资' }
                 )
-            } else {
-                return h(
-                            NButton,
-                            {
-                                type: 'error',
-                                dashed: true,    
-                                style: {
-                                    marginRight: '6px',
-                                },
-                                
-                                size: 'small',
-                                onClick: () => sendMail(row)
-                            },
-                            
-                            { default: () => 'Send Mail' }
-                        )
-                }
+            }
         })
         return button
       }
@@ -72,36 +56,31 @@ const createColumns = ({ sendMail }) => {
   ]
 }
 
-const createData = () => [
-  {
-    id: 0,
-    name: 'John Brown',
-    email: 32,
-    describe: 'New York No. 1 Lake Park',
-  },
-  {
-    id: 1,
-    name: 'Jim Green',
-    email: 42,
-    describe: 'London No. 1 Lake Park',
-  },
-  {
-    id: 2,
-    name: 'Joe Black',
-    email: 32,
-    describe: 'Sidney No. 1 Lake Park',
-  }
-]
-
+import {HTTPGetDepartment,HTTPGetCompute} from './HttpMethods'
 export default defineComponent({
   setup () {
-    const message = useMessage()
+    const data = ref([])
+    onMounted(() => {
+      getDepartment()
+    })
+    //表格中的数据
+    const getDepartment = () => {
+      HTTPGetDepartment().then(res => {
+        data.value = res
+      })
+    }
+    //计算薪资
+    const compute = (id) => {
+      HTTPGetCompute(id).then(res =>{
+          if(res.code === 200){
+            console.log(1)
+          }
+        })
+    }
     return {
-      data: createData(),
+      data,
       columns: createColumns({
-        sendMail (rowData) {
-          message.info('send mail to ' + rowData.name)
-        }
+        compute
       }),
       pagination: {
         pageSize: 10

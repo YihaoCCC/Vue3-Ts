@@ -1,5 +1,12 @@
 <template>
-    <n-card hoverable>
+    <n-card
+    title="卡片分段示例"
+    :segmented="{
+      content: true,
+      footer: 'soft'
+    }"
+    hoverable
+  >
     <n-data-table
       :bordered="false"
       :columns="columns"
@@ -10,11 +17,11 @@
 </template>
     
 <script>
-//表格数据  GET     /signIn/query/{userId}&{pageNum}
-import { h, defineComponent } from 'vue'
+//表格数据  GET     /signIn/query/{userId}
+import { h, defineComponent, ref, onMounted } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
-const createColumns = ({ sendMail }) => {
+const createColumns = () => {
   return [
     {
       title: '员工号',
@@ -68,39 +75,24 @@ const createColumns = ({ sendMail }) => {
   ]
 }
 
-const createData = () => [
-  {
-    key: 0,
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer']
-  },
-  {
-    key: 1,
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['wow']
-  },
-  {
-    key: 2,
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher']
-  }
-]
 
+import {HTTPGetSignRecord} from './HttpMethods'
 export default defineComponent({
   setup () {
-    const message = useMessage()
+    const data = ref([])
+    onMounted(() => {
+      getSignRecord()
+    })
+    //表格中的数据
+    const getSignRecord = () => {
+      let id = localStorage.getItem("USERID")
+      HTTPGetSignRecord(id).then(res => {
+        data.value = res
+      })
+    }
     return {
-      data: createData(),
+      data,
       columns: createColumns({
-        sendMail (rowData) {
-          message.info('send mail to ' + rowData.name)
-        }
       }),
       pagination: {
         pageSize: 10

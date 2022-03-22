@@ -8,8 +8,8 @@
     hoverable
   >
     <template #header-extra>
-      <n-button tertiary type="primary" @click="activate">
-          添加系统公告
+      <n-button tertiary type="primary" @click="handleActivate()">
+          添加公告
       </n-button>
     </template>
     <n-data-table
@@ -21,11 +21,18 @@
     <n-drawer v-model:show="active" :width="502">
       <n-drawer-content>
         <template #header>
-          Header
+          公告信息
         </template>
-        <template #footer>
-          <n-button>Footer</n-button>
-        </template>
+        <n-form >
+          <n-form-item label='公告内容' >
+            <n-input placeholder="请输入公告内容" type='textarea' v-model:value="form.content">
+
+            </n-input>
+          </n-form-item>
+        </n-form>
+        <n-button @click="addMessage" type="primary">
+          添加
+        </n-button>
       </n-drawer-content>
     </n-drawer>
   </n-card>
@@ -33,14 +40,13 @@
 </template>
     
 <script>
-//表格数据  GET     /message/query/{userId}&{pageNum}
-//添加系统公告  Post    /message/add       json{content，userId，name，type，departmentId}
-//添加部门公告  Post    /message/add       json{content，userId，name，type，departmentId}
+//表格数据  GET     /message/queryAll
+//添加公告  Post    /message/add       json{content，userId，name}
 //删除     Delete    /message/delete/{id}
-import { h, defineComponent, ref } from 'vue'
+import { h, defineComponent, ref, onMounted } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
-const createColumns = ({ sendMail }) => {
+const createColumns = ({ deleteMessage }) => {
   return [
     {
       title: '公告内容',
@@ -62,37 +68,23 @@ const createColumns = ({ sendMail }) => {
       title: 'Action',
       key: 'actions',
       render (row) {
-        const button = [1,2].map((item) => {
+        const button = [1].map((item) => {
             if(item === 1) {
                 return h(
                     NButton,
                     {
+                        type: 'error',
+                        dashed: true,
                         style: {
                             marginRight: '6px'
                         },
                         size: 'small',
-                        onClick: () => sendMail(row)
+                        onClick: () => deleteMessage(row.id)
                     },
                     
                     { default: () => '删除' }
                 )
-            } else {
-                return h(
-                            NButton,
-                            {
-                                type: 'error',
-                                dashed: true,    
-                                style: {
-                                    marginRight: '6px',
-                                },
-                                
-                                size: 'small',
-                                onClick: () => sendMail(row)
-                            },
-                            
-                            { default: () => 'Send Email' }
-                        )
-                }
+            } 
         })
         return button
       }
@@ -100,46 +92,54 @@ const createColumns = ({ sendMail }) => {
   ]
 }
 
-const createData = () => [
-  {
-    id: 0,
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    department:null,
-    tags: ['nice', 'developer']
-  },
-  {
-    id: 1,
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['wow']
-  },
-  {
-    id: 2,
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher']
-  }
-]
 
+import {HTTPGetMessage, HTTPAddMessage, HTTPDeleteMessage} from './HttpMethods'
 export default defineComponent({
   setup () {
-    const message = useMessage()
     const active = ref(false)
-    const activate = () => {
+    let form = ref({
+      content:'',
+      userId:localStorage.getItem("USERID"),
+      name: ''
+    })
+    const data = ref([])
+    onMounted(() => {
+      getMessage()
+    })
+    //表格中的数据
+    const getMessage = () => {
+      HTTPGetMessage().then(res => {
+        data.value = res
+      })
+    }
+    //添加 
+    const addMessage = () => {
+      HTTPAddMessage(form.value).then(res =>{
+          if(res.code === 200){
+            getMessage()
+          }
+      })
+      active.value = false
+    }
+    //删除
+    const deleteMessage = (id) => {
+      HTTPDeleteMessage(id).then(res =>{
+          if(res.code === 200){
+            getMessage()
+          }
+        })
+    }
+    const handleActivate= () => {
       active.value = true
     }
     return {
+      form,
       active,
-      activate,
-      data: createData(),
+      addMessage,
+      handleActivate,
+      data,
       columns: createColumns({
-        sendMail (rowData) {
-          message.info('send mail to ' + rowData.name)
-        }
+        deleteMessage
       }),
       pagination: {
         pageSize: 10

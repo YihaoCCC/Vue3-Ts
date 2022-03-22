@@ -80,14 +80,14 @@ const routes: RouteRecordRaw[]= [
                  component: () => import('../pages/attendance/signRecord.vue')
              },
              {
-                path: '/attendanceRecord',
-                name: 'attendanceRecord',
-                component: () => import('../pages/attendance/attendanceRecord.vue')
+                path: '/attendanceType',
+                name: 'attendanceType',
+                component: () => import('../pages/attendance/attendanceType.vue')
             },
             {
-                path: '/attendanceInstitution',
-                name: 'attendanceInstitution',
-                component: () => import('../pages/attendance/attendanceInstitution.vue')
+                path: '/attendanceTime',
+                name: 'attendanceTime',
+                component: () => import('../pages/attendance/attendanceTime.vue')
             },
             {
                 path: '/task',

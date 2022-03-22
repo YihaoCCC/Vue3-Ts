@@ -8,7 +8,7 @@
     hoverable
   >
     <template #header-extra>
-      <n-button tertiary type="primary" @click="activate">
+      <n-button tertiary type="primary" @click="handleActivate()">
           申请出差
       </n-button>
     </template>
@@ -21,11 +21,21 @@
     <n-drawer v-model:show="active" :width="502">
       <n-drawer-content>
         <template #header>
-          Header
+          出差记录信息
         </template>
-        <template #footer>
-          <n-button>Footer</n-button>
-        </template>
+        <n-form> 
+          <n-form-item label='出差时间' >
+            <n-date-picker v-model:formatted-value="form.date" value-format="yyyy-MM-dd" type="daterange" clearable />
+          </n-form-item>
+          <n-form-item label='出差原因' >
+             <n-input placeholder="请输入出差原因"  v-model:value="form.reason">
+
+            </n-input>
+          </n-form-item>
+        </n-form>
+        <n-button @click="addWorkOut" type="primary">
+          添加
+        </n-button>
       </n-drawer-content>
     </n-drawer>
   </n-card>
@@ -33,12 +43,12 @@
 </template>
 
 <script>
-//表格数据  GET     /travel/query/{userId}&{pageNum}
+//表格数据  GET     /travel/query/{userId}
 //添加  Post    /travel/add       json{userId，name，reason，beginDate，endDate}
-import { h, defineComponent, ref } from 'vue'
+import { h, defineComponent, ref, onMounted } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
-const createColumns = ({ sendMail }) => {
+const createColumns = () => {
   return [
     {
       title: '员工号',
@@ -88,45 +98,47 @@ const createColumns = ({ sendMail }) => {
   ]
 }
 
-const createData = () => [
-  {
-    key: 0,
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer']
-  },
-  {
-    key: 1,
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['wow']
-  },
-  {
-    key: 2,
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher']
-  }
-]
-
+import {HTTPGetWorkOut, HTTPAddWorkOut} from './HttpMethods'
 export default defineComponent({
   setup () {
-    const message = useMessage()
     const active = ref(false)
-    const activate = () => {
+    let form = ref({
+          date:null,
+          beginDate: '',
+          endDate: '',
+          reason:''
+    })
+    const data = ref([])
+    onMounted(() => {
+      getWorkOut()
+    })
+    //表格中的数据
+    const getWorkOut = () => {
+      let id = localStorage.getItem("USERID")
+      HTTPGetWorkOut(id).then(res => {
+        data.value = res
+      })
+    }
+    //添加 
+    const addWorkOut = () => {
+      console.log(form.value)
+      // HTTPAddLeave(form.value).then(res =>{
+      //     if(res.code === 200){
+      //       getLeave()
+      //     }
+      // })
+      active.value = false
+    }
+    const handleActivate= () => {
       active.value = true
     }
     return {
+      form,
       active,
-      activate,
-      data: createData(),
+      data,
+      addWorkOut,
+      handleActivate,
       columns: createColumns({
-        sendMail (rowData) {
-          message.info('send mail to ' + rowData.name)
-        }
       }),
       pagination: {
         pageSize: 10

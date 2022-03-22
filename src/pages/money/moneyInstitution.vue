@@ -8,7 +8,7 @@
     hoverable
   >
     <template #header-extra>
-      <n-button tertiary type="primary" @click="activate">
+      <n-button tertiary type="primary" @click="handleActivate(0)">
           添加薪资制度
       </n-button>
     </template>
@@ -21,11 +21,23 @@
     <n-drawer v-model:show="active" :width="502">
       <n-drawer-content>
         <template #header>
-          Header
+          部门信息
         </template>
-        <template #footer>
-          <n-button>Footer</n-button>
-        </template>
+        <n-form >
+          <n-form-item label='职位' >
+            <n-select placeholder="请选择职位" v-model:value="form.positionId" :options="positionOptions">
+
+            </n-select>
+          </n-form-item>
+          <n-form-item label='每天薪资' >
+            <n-input-number placeholder="请输入每天薪资" v-model:value="form.money">
+              <template #prefix>￥</template>
+            </n-input-number>
+          </n-form-item>
+        </n-form>
+        <n-button @click="addMoneyInstitution" type="primary">
+          {{!actionType ? '添加' : '修改'}}
+        </n-button>
       </n-drawer-content>
     </n-drawer>
   </n-card>
@@ -33,14 +45,14 @@
 </template>
 
 <script>
-//表格数据  GET     /salarySystem/queryAll/{pageNum}
+//表格数据  GET     /salarySystem/queryAll
 //添加     Post    /salarySystem/add       json{positionId,money}
 //修改     PUT     /salarySystem/update    json{id,positionId,money}
 //删除     Delete    /salarySystem/delete/{id}
-import { h, defineComponent, ref } from 'vue'
+import { h, defineComponent, ref, onMounted } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
-const createColumns = ({ sendMail }) => {
+const createColumns = ({ handleActivate,deleteMoneyInstitution }) => {
   return [
     {
       title: '职位名称',
@@ -63,7 +75,7 @@ const createColumns = ({ sendMail }) => {
                             marginRight: '6px'
                         },
                         size: 'small',
-                        onClick: () => sendMail(row)
+                        onClick: () => handleActivate(1,row)
                     },
                     
                     { default: () => '修改' }
@@ -79,7 +91,7 @@ const createColumns = ({ sendMail }) => {
                                 },
                                 
                                 size: 'small',
-                                onClick: () => sendMail(row)
+                                onClick: () => deleteMoneyInstitution(row.id)
                             },
                             
                             { default: () => '删除' }
@@ -92,45 +104,90 @@ const createColumns = ({ sendMail }) => {
   ]
 }
 
-const createData = () => [
-  {
-    key: 0,
-    name: 'John Brown',
-    money: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer']
-  },
-  {
-    key: 1,
-    name: 'Jim Green',
-    money: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['wow']
-  },
-  {
-    key: 2,
-    name: 'Joe Black',
-    money: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher']
-  }
-]
 
+
+import {HTTPGetMoneyInstitution, HTTPAddMoneyInstitution, HTTPUpdataMoneyInstitution, HTTPDeleteMoneyInstitution,HTTPGetPosition} from './HttpMethods'
 export default defineComponent({
   setup () {
-    const message = useMessage()
     const active = ref(false)
-    const activate = () => {
+    let form = ref({
+          positionId: null,
+          money: ''
+    })
+    const data = ref([])
+    const positionOptions = ref([])
+    onMounted(() => {
+      getMoneyInstitution()
+      getOptions()
+    })
+    const getOptions = () => {
+      HTTPGetPosition().then( res =>{
+        res.forEach(element => {
+          positionOptions.value.push({
+            value: element.id,
+            label: element.name
+            })
+          });
+      })
+    }
+    const actionType = ref(0)  // 0代表增加，1代表修改
+    //表格中的数据
+    const getMoneyInstitution = () => {
+      HTTPGetMoneyInstitution().then(res => {
+        data.value = res
+      })
+    }
+    //添加
+    //修改
+    const addMoneyInstitution = () => {
+      if( !actionType.value ) {
+        HTTPAddMoneyInstitution(form.value).then(res =>{
+          if(res.code === 200){
+            getMoneyInstitution()
+          }
+        })
+      } else {
+        HTTPUpdataMoneyInstitution(form.value).then(res =>{
+          if(res.code === 200){
+            getMoneyInstitution()
+          }
+        })
+      }
+      active.value = false
+    }
+    //删除
+    const deleteMoneyInstitution = (id) => {
+      HTTPDeleteMoneyInstitution(id).then(res =>{
+          if(res.code === 200){
+            getMoneyInstitution()
+          }
+        })
+    }
+    const handleActivate= (type, item) => {
       active.value = true
+      if( type ) {
+        form.value = item
+        actionType.value = 1
+      } else {
+        form.value = {
+          positionId: null,
+          money: ''
+        }
+        actionType.value = 0
+      } 
     }
     return {
+      form,
+      actionType,
+      addMoneyInstitution,
+      deleteMoneyInstitution,
+      positionOptions,
       active,
-      activate,
-      data: createData(),
+      handleActivate,
+      data,
       columns: createColumns({
-        sendMail (rowData) {
-          message.info('send mail to ' + rowData.name)
-        }
+        handleActivate,
+        deleteMoneyInstitution
       }),
       pagination: {
         pageSize: 10

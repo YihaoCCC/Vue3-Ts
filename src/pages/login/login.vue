@@ -71,12 +71,12 @@ export default {
                     if(res.code === 200) {
                         localStorage.setItem('USERID', res.obj.userId)
                         let permission:any = []
-                        res.obj.position.permission.forEach( (element:any) => {
+                        res.obj.permission.forEach( (element:any) => {
                            permission.push( element.code )
                         });
                         localStorage.setItem('permission', permission)
                         let menu:any = []
-                        res.obj.position.menu.forEach( (element:any) => {
+                        res.obj.menu.forEach( (element:any) => {
                            menu.push( element.code )
                         });
                         localStorage.setItem('MENU', menu)

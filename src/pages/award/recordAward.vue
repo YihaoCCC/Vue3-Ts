@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { h, defineComponent, ref,  onMounted } from 'vue'
+import { h, defineComponent, ref, onMounted } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
 const createColumns = () => {
@@ -133,7 +133,8 @@ export default defineComponent({
     }
     //表格中的数据  Get请求     /jiangcheng/query/{userId}
     const getRecordAward = () => {
-      HTTPGetRecordAward().then(res => {
+      let id = localStorage.getItem("USERID")
+      HTTPGetRecordAward(id).then(res => {
         data.value = res
       })
     }
@@ -146,7 +147,7 @@ export default defineComponent({
       })
       active.value = false
     }
-    const handleActivate= (type, item) => {
+    const handleActivate= () => {
       active.value = true
     }
     return {

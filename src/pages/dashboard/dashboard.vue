@@ -33,7 +33,7 @@
             <n-menu
               :collapsed-icon-size="22"
               :options="menuOptions"
-              style="height: 92.5vh"
+              style="height: 92.5vh;overflow: visible !important;"
               :value='currentMenu'
               @update:value="handleUpdateMenu"
             />
@@ -240,21 +240,21 @@ export default defineComponent({
         children: [
               {
                 label: '考勤记录',
-                key: 'attendanceRecord',
+                key: 'signRecord',
                 icon: renderIcon(BookIcon),
                 routerLink: '/signRecord'
               },
               {
                 label: '考勤类型制度',
-                key: 'attendanceInstitution',
+                key: 'attendanceType',
                 icon: renderIcon(BookIcon),
-                routerLink: 'attendanceRecord'
+                routerLink: '/attendanceType'
               },
               {
                 label: '考勤时间制度',
-                key: 'Attendance3-man',
+                key: 'attendanceTime',
                 icon: renderIcon(BookIcon),
-                routerLink: '/attendanceInstitution'
+                routerLink: '/attendanceTime'
               },
         ]
       },

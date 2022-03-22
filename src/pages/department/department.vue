@@ -41,7 +41,7 @@
           </n-form-item>
         </n-form>
         <n-button @click="addDepartment" type="primary">
-          {{!actionType ? '添加该部门' : '修改该部门'}}
+          {{!actionType ? '添加' : '修改'}}
         </n-button>
       </n-drawer-content>
     </n-drawer>
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { h, defineComponent, ref,  onMounted } from 'vue'
+import { h, defineComponent, ref, onMounted } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
 const createColumns = ({ handleActivate,deleteDepartment }) => {

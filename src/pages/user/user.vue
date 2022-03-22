@@ -23,7 +23,7 @@
         <template #header>
           员工信息
         </template>
-        <n-form inline >
+        <n-form>
           <n-form-item label='用户姓名' >
             <n-input placeholder="用户姓名"  v-model:value="form.name" >
 
@@ -79,22 +79,21 @@
         </n-form>
         <n-form> 
           <n-form-item label='所在部门' >
-            <n-select placeholder="请选择所在部门"  :options="departmentOptions">
+            <n-select placeholder="请选择所在部门" v-model:value="form.departmentId" :options="departmentOptions">
 
             </n-select>
           </n-form-item>
           <n-form-item label='职位' >
-            <n-select placeholder="请选择职位" v-model:value="form.positionId" :options="positionOptions">
+            <n-select placeholder="请选择职位"
+      multiple
+      v-model:value="positonArray" :options="positionOptions">
 
             </n-select>
           </n-form-item>
         </n-form>
         <n-button @click="addOrUpdataUser" type="primary">
-          {{!actionType ? '添加该用户' : '修改该用户'}}
+          {{!actionType ? '添加' : '修改'}}
         </n-button>
-        <template #footer>
-          <n-button>Footer</n-button>
-        </template>
       </n-drawer-content>
     </n-drawer>
   </n-card>
@@ -157,7 +156,24 @@ const createColumns = ({ handleActivate, deleteUser }) => {
     },
     {
       title: '职位',
-      key: 'position.name'
+      key: 'position',
+      render(row) {
+        const tags = row.position.map((tagKey) => {
+          return h(
+            NTag,
+            {
+              style: {
+                marginRight: '6px'
+              },
+              type: 'info'
+            },
+            {
+              default: () => tagKey.name
+            }
+          )
+        })
+        return tags
+      }
     },
     {
       title: 'Action',
@@ -219,11 +235,12 @@ export default defineComponent({
         email: '',
         nativePlace: null,
         address: null,
-        phone: '',
+        phone:null,
         beginDate: null,
         departmentId:null,
-        positionId:''
+        positionId:null
     })
+    const positonArray = ref([])
     onMounted(() => {
       getUser()
       getOptions()
@@ -233,7 +250,7 @@ export default defineComponent({
         res.forEach(element => {
           departmentOptions.value.push({
             value: element.id,
-            lable: element.name
+            label: element.name
             })
           });
       })
@@ -241,7 +258,7 @@ export default defineComponent({
         res.forEach(element => {
           positionOptions.value.push({
             value: element.id,
-            lable: element.name
+            label: element.name
             })
           });
       })
@@ -253,6 +270,8 @@ export default defineComponent({
         })
     }
     const addOrUpdataUser = () => {
+      form.value.positionId = positonArray.value 
+      console.log(form.value)
       if( !actionType.value ) {
         HTTPAddUser(form.value).then(res =>{
           if(res.code === 200){
@@ -262,15 +281,19 @@ export default defineComponent({
       } else {
         HTTPUpdataUser(form.value)
       }
+      active.value = false
     }
     const deleteUser = (id) => {
       HTTPDeleteUser(id)
     }
     const handleActivate= (type, item) => {
       active.value = true
+      positonArray.value = []
       if( type ) {
         form.value = item
-        console.log(form.value)
+        form.value?.position.forEach((item) => {
+          positonArray.value.push(item.id)
+        })
         actionType.value = 1
       } else {
         form.value = {
@@ -284,7 +307,7 @@ export default defineComponent({
             phone: '',
             beginDate: null,
             departmentId:null,
-            positionId:''
+            positionId:null
         }
         actionType.value = 0
       } 
@@ -293,6 +316,7 @@ export default defineComponent({
       active,
       actionType,
       form,
+      positonArray,
       departmentOptions,
       positionOptions,
       handleActivate,
@@ -302,9 +326,6 @@ export default defineComponent({
       columns: createColumns({
         handleActivate,
         deleteUser,
-        sendMail (rowData) {
-          message.info('send mail to ' + rowData.name)
-        }
       }),
       pagination: {
         pageSize: 10

@@ -30,6 +30,7 @@ import {
   NRadioGroup,
   NRadio,
   NInputNumber,
+  NTimePicker,
 } from 'naive-ui'
 
 
@@ -64,6 +65,7 @@ function setNavieUiComponents(app: {use:(naive:any) => void}):void {
             NRadioGroup,
             NRadio,
             NInputNumber,
+            NTimePicker,
         ]
       })
       app.use(naive)

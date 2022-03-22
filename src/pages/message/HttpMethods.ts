@@ -24,20 +24,12 @@ function publicMethod(path:string, type:string, data?:any) {
     }
     return result
 }
-export function HTTPGetRecordAward(id:string) {
-    return  publicMethod(`/api/jiangcheng/query/${id}`, 'get') 
+export function HTTPGetMessage() {
+    return  publicMethod('/api/message/queryAll', 'get')
 }
-export function HTTPAddRecordAward(data:any) {
-    return publicMethod('/api/jiangcheng/add', 'post', data)
+export function HTTPAddMessage(data:any) {
+    return publicMethod('/api/message/add', 'post', data)
 }
-export function HTTPGetInstitution() {
-    return  publicMethod('/api/jiangchengSystem/queryAll', 'get') 
+export function HTTPDeleteMessage(id:number) {
+    return publicMethod(`/api/message/delete/${id}`,'delete')
 }
-export function HTTPAddInstitution(data:any) {
-    return publicMethod('/api/jiangchengSystem/add', 'post', data)
-}
-export function HTTPUpdataInstitution(data:any) {
-    return publicMethod('/api/jiangchengSystem/update','put',data)
-}
-
-
