@@ -8,7 +8,7 @@
     hoverable
   >
     <template #header-extra>
-      <n-button tertiary type="primary" @click="handleActivate()">
+      <n-button tertiary type="primary" @click="handleActivate()" :disabled="isAuthPre('JIANGCHENG_RECORD:INSERTALL') && isAuthPre('JIANGCHENG_RECORD:INSERTDEPT')">
           添加奖惩记录
       </n-button>
     </template>
@@ -26,7 +26,6 @@
         <n-form> 
           <n-form-item label='员工姓名' >
             <n-select placeholder="请选择员工" v-model:value="form.userId" :options="userOptions">
-
             </n-select>
           </n-form-item>
           <n-form-item label='奖惩名' >
@@ -45,7 +44,7 @@
 </template>
 
 <script>
-import { h, defineComponent, ref, onMounted } from 'vue'
+import { h, defineComponent, ref, onMounted,getCurrentInstance } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
 const createColumns = () => {
@@ -94,13 +93,18 @@ const createColumns = () => {
     {
       title: '奖惩时间',
       key: 'date'
+    },
+    {
+      title:'奖惩状态',
+      key: 'state'
     }
   ]
 }
 
-import {HTTPGetRecordAward, HTTPAddRecordAward} from './HttpMethods'
+import {HTTPGetRecordAward, HTTPAddRecordAward,HTTPGetInstitution,HTTPGetUser} from './HttpMethods'
 export default defineComponent({
   setup () {
+    const isAuthPre= getCurrentInstance()?.appContext.config.globalProperties.isAuthPer
     const active = ref(false)
     let form = ref({
           userId: '',
@@ -114,22 +118,23 @@ export default defineComponent({
       getOptions()
     })
     const getOptions = () => {
-      // HTTPGetDepartment().then(res =>{
-      //   res.forEach(element => {
-      //     departmentOptions.value.push({
-      //       value: element.id,
-      //       lable: element.name
-      //       })
-      //     });
-      // })
-      // HTTPGetPosition().then( res =>{
-      //   res.forEach(element => {
-      //     positionOptions.value.push({
-      //       value: element.id,
-      //       lable: element.name
-      //       })
-      //     });
-      // })
+      let id = localStorage.getItem("USERID")
+      HTTPGetUser(id).then(res =>{
+        res.forEach(element => {
+          userOptions.value.push({
+            value: element.userId,
+            label: element.name
+            })
+          });
+      })
+      HTTPGetInstitution().then( res =>{
+        res.forEach(element => {
+          institutionOptions.value.push({
+            value: element.id,
+            label: element.name
+            })
+          });
+      })
     }
     //表格中的数据  Get请求     /jiangcheng/query/{userId}
     const getRecordAward = () => {
@@ -145,12 +150,17 @@ export default defineComponent({
             getRecordAward()
           }
       })
+      form.value = {
+        userId: '',
+        jiangchengId: ''
+      }
       active.value = false
     }
     const handleActivate= () => {
       active.value = true
     }
     return {
+      isAuthPre,
       form,
       userOptions,
       institutionOptions,

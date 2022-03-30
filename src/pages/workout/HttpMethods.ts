@@ -33,8 +33,8 @@ export function HTTPAddWorkOut(data:any) {
 export function HTTPGetWorkOutRequest(id:string) {
     return  publicMethod(`/api/travel/queryUnapproved/${id}`, 'get') 
 }
-export function HTTPUpdataWorkOutRequest(data:any) {
-    return publicMethod('/api/travel/update','put',data)
+export function HTTPUpdataWorkOutRequest(id:number) {
+    return publicMethod(`/api/travel/update/${id}`,'put')
 }
 
 

@@ -1,6 +1,6 @@
 <template>
 <n-card
-    title="卡片分段示例"
+    title=" "
     :segmented="{
       content: true,
       footer: 'soft'
@@ -23,7 +23,7 @@
         <template #header>
           部门信息
         </template>
-        <n-form >
+        <n-form :rules="rules">
           <n-form-item label='部门名称' >
             <n-input placeholder="请输入部门名称"  v-model:value="form.name" >
 

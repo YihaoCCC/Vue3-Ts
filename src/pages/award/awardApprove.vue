@@ -23,7 +23,7 @@
 import { h, defineComponent, ref, onMounted } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
-const createColumns = ({ LeaveRequest }) => {
+const createColumns = ({ AwardApprove }) => {
   return [
     {
       title: '员工号',
@@ -31,27 +31,23 @@ const createColumns = ({ LeaveRequest }) => {
     },
     {
       title: '员工姓名',
-      key: 'name'
+      key: 'user.name'
     },
     {
-      title: '请假原因',
-      key: 'reason'
+      title: '奖惩原因',
+      key: 'jiangchengSystem.name'
     },
     {
-      title: '开始时间',
-      key: 'beginDate'
+      title: '奖惩金额',
+      key: 'jiangchengSystem.money'
     },
     {
-      title: '结束时间',
-      key: 'endDate'
-    },
-    {
-      title: '审批状态',
-      key: 'state'
+      title: '奖惩类型',
+      key: 'jiangchengSystem.type'
     },
     // {
-    //   title: '审批状态',
-    //   key: 'tags',
+    //   title: '奖惩类型',
+    //   key: 'name',
     //   render (row) {
     //     const tags = row.tags.map((tagKey) => {
     //       return h(
@@ -69,7 +65,15 @@ const createColumns = ({ LeaveRequest }) => {
     //     })
     //     return tags
     //   }
-    // }
+    // },
+    {
+      title: '奖惩时间',
+      key: 'date'
+    },
+    {
+      title:'奖惩状态',
+      key: 'state'
+    },
     {
       title: '操作',
       key: 'actions',
@@ -83,7 +87,7 @@ const createColumns = ({ LeaveRequest }) => {
                             marginRight: '6px'
                         },
                         size: 'small',
-                        onClick: () => LeaveRequest(row.id)
+                        onClick: () => AwardApprove(row.id)
                     },
                     
                     { default: () => '批准' }
@@ -96,32 +100,31 @@ const createColumns = ({ LeaveRequest }) => {
   ]
 }
 
-import {HTTPGetLeaveRequest,HTTPUpdataLeaveRequest} from './HttpMethods'
+import {HTTPGetAwardApprove,HTTPUpdataAwardApprove} from './HttpMethods'
 export default defineComponent({
   setup () {
     const data = ref([])
     onMounted(() => {
-      getLeaveRequest()
+      getAwardApprove()
     })
     //表格中的数据
-    const getLeaveRequest = () => {
-      let id = localStorage.getItem("USERID")
-      HTTPGetLeaveRequest(id).then(res => {
+    const getAwardApprove = () => {
+      HTTPGetAwardApprove().then(res => {
         data.value = res
       })
     }
     //审批
-    const LeaveRequest = (id) => {
-      HTTPUpdataLeaveRequest(id).then(res =>{
+    const AwardApprove = (id) => {
+      HTTPUpdataAwardApprove(id).then(res =>{
           if(res.code === 200){
-            getLeaveRequest()
+            getAwardApprove()
           }
         })
     }
     return {
       data,
       columns: createColumns({
-        LeaveRequest
+        AwardApprove
       }),
       pagination: {
         pageSize: 10

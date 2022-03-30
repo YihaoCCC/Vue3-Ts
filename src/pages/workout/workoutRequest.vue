@@ -83,7 +83,7 @@ const createColumns = ({ WorkOutRequest }) => {
                             marginRight: '6px'
                         },
                         size: 'small',
-                        onClick: () => WorkOutRequest(row)
+                        onClick: () => WorkOutRequest(row.id)
                     },
                     
                     { default: () => '批准' }
@@ -111,8 +111,8 @@ export default defineComponent({
       })
     }
     //审批
-    const WorkOutRequest = (row) => {
-      HTTPUpdataWorkOutRequest(row).then(res =>{
+    const WorkOutRequest = (id) => {
+      HTTPUpdataWorkOutRequest(id).then(res =>{
           if(res.code === 200){
             getWorkOutRequest()
           }

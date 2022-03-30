@@ -17,7 +17,10 @@
                 </template>
                 <span> 切换主题模式</span>
               </n-popover>
-              <Avatar></Avatar>
+              <n-message-provider>
+                <Avatar></Avatar>
+
+              </n-message-provider>
             </div>
           </div>
         </n-layout-header>
@@ -40,6 +43,8 @@
           </n-layout-sider>
           <n-layout-content >
             <div class="dashboard">
+              <n-notification-provider>
+             
               <n-message-provider>
 
                 <n-card embedded class="card">
@@ -59,6 +64,7 @@
                         </router-view>
                 </n-card>
               </n-message-provider>
+               </n-notification-provider>
 
             </div>
             
@@ -105,7 +111,7 @@ export default defineComponent({
   },
   created() {
       this.currentMenu= this.$route.name
-      console.log(this.currentMenu)
+      this.currentName = this.$route.meta.label
   },
   setup () {
     const $isAuth = getCurrentInstance()?.appContext.config.globalProperties.isAuth
@@ -130,32 +136,49 @@ export default defineComponent({
         label: '部门管理',
         key: 'department',
         icon: renderIcon(BusinessOutline),
-        routerLink: '/department'
+        routerLink: '/department',
+        disabled: $isAuth('DEPARTMENT')
+      },
+      {
+        label: '职位管理',
+        key: 'position',
+        routerLink: '/position',    
+        icon: renderIcon(BookIcon),
+        disabled: $isAuth('POSITION')
       },
       {
         label: '员工管理',
         key: 'user',
         icon: renderIcon(PersonOutline),
-        routerLink: '/user'
+        routerLink: '/user',
+        disabled: $isAuth('USER')
       },
       {
         label: '奖惩管理',
         key: 'pinball-1973',
         icon: renderIcon(RibbonOutline),
+        disabled: $isAuth('JIANGCHENG'),
         children: [
           {
             label: '奖惩记录',
             key: 'recordAward',
             icon: renderIcon(RibbonOutline),
             routerLink: '/recordAward',
-            disabled: $isAuth('USER:UPDATE')
+            disabled: $isAuth('JIANGCHENG_RECORD')
+          },
+          {
+            label: '奖惩审批',
+            key: 'awardApprove',
+            icon: renderIcon(RibbonOutline),
+            routerLink: '/awardApprove',
+            disabled: $isAuth('JIANGCHENG_APPROVE')
           },
           {
             label: '奖惩制度',
             key: 'institution',
             icon: renderIcon(RibbonOutline),
             routerLink: '/institution',
-            disabled: $isAuth('USER:UPDATE')
+            disabled: $isAuth('JIANGCHENG_SYSTEM')
           }
         ]
       },
@@ -163,18 +186,21 @@ export default defineComponent({
         label: '请假管理',
         key: 'leave',
         icon: renderIcon(PersonOutline),
+        disabled: $isAuth('LEAVE'),
         children: [
           {
             label: '请假记录',
             key: 'leave',
             icon: renderIcon(PersonOutline),
             routerLink: '/leave',
+            disabled: $isAuth('LEAVE_RECORD')
           },
           {
             label: '请假审批',
             key: 'leaveRequest',
             icon: renderIcon(PersonOutline),
             routerLink: '/leaveRequest',
+            disabled: $isAuth('LEAVE_APPROVE')
           }
         ]
       },
@@ -182,19 +208,22 @@ export default defineComponent({
         label: '出差管理',
         key: 'out',
         icon: renderIcon(BookIcon),
+        disabled: $isAuth('TRAVEL'),
         children: [
           {
             label: '出差记录',
             key: 'workout',
             icon: renderIcon(BookIcon),
-            routerLink: '/workout',    
+            routerLink: '/workout', 
+            disabled: $isAuth('TRAVEL_RECORD')   
             
           },
           {
             label: '出差审批',
             key: 'workoutRequest',
             icon: renderIcon(BookIcon),
-            routerLink: '/workoutRequest',    
+            routerLink: '/workoutRequest',  
+            disabled: $isAuth('TRAVEL_APPROVE')  
             
           }
         ]
@@ -203,33 +232,35 @@ export default defineComponent({
         label: '公告管理',
         key: 'message',
         icon: renderIcon(PersonOutline),
-        routerLink: '/message'
+        routerLink: '/message',
+        disabled: $isAuth('MESSAGE')
       },
       {
         label: '薪资管理',
         key: 'money',
         icon: renderIcon(BookIcon),
+        disabled: $isAuth('SALARY'),
         children: [
           {
             label: '薪资记录',
             key: 'moneyRecord',
             icon: renderIcon(BookIcon),
             routerLink: '/moneyRecord',
-            disabled: $isAuth('USER:UPDATE')
+            disabled: $isAuth('SALARY_RECORD')
           },
           {
             label: '薪资制度',
             key: 'moneyInstitution',
             icon: renderIcon(BookIcon),
             routerLink: '/moneyInstitution',
-            disabled: $isAuth('USER:UPDATE')
+            disabled: $isAuth('SALARY_SYSTEM')
           },
           {
             label: '计算薪资',
             key: 'compute',
             icon: renderIcon(BookIcon),
             routerLink: '/compute',
-            disabled: $isAuth('USER:UPDATE')
+            disabled: $isAuth('SALARY_COMPUTE')
           }
         ]
       },
@@ -237,24 +268,28 @@ export default defineComponent({
         label: '考勤管理',
         key: 'Attendance',
         icon: renderIcon(BookIcon),
+        disabled: $isAuth('SIGN'),
         children: [
               {
                 label: '考勤记录',
                 key: 'signRecord',
                 icon: renderIcon(BookIcon),
-                routerLink: '/signRecord'
+                routerLink: '/signRecord',
+                disabled: $isAuth('SIGN_RECORD')
               },
               {
                 label: '考勤类型制度',
                 key: 'attendanceType',
                 icon: renderIcon(BookIcon),
-                routerLink: '/attendanceType'
+                routerLink: '/attendanceType',
+                disabled: $isAuth('SIGN_TYPE')
               },
               {
                 label: '考勤时间制度',
                 key: 'attendanceTime',
                 icon: renderIcon(BookIcon),
-                routerLink: '/attendanceTime'
+                routerLink: '/attendanceTime',
+                disabled: $isAuth('SIGN_TIME')
               },
         ]
       },
@@ -262,29 +297,25 @@ export default defineComponent({
         label: '任务管理',
         key: 'task',
         icon: renderIcon(BookIcon),
+        disabled: $isAuth('TASK'),
         children: [
               {
                 label: '任务记录',
                 key: 'task',
                 icon: renderIcon(BookIcon),
-                routerLink: '/task'
+                routerLink: '/task',
+                disabled: $isAuth('TASK_RECORD')
               },
               {
-                label: '我的任务提交',
+                label: '我的任务',
                 key: 'taskSubmit',
                 icon: renderIcon(BookIcon),
-                routerLink: '/taskSubmit'
+                routerLink: '/taskSubmit',
+                disabled: $isAuth('TASK_SUBMIT')
               }
         ]
       },
-      {
-        label: '职位管理',
-        key: 'position',
-        routerLink: '/position',    
-        icon: renderIcon(BookIcon)
-      },
 ]
-    console.log()
     const currentMenu = ref()
     const currentName = ref()
     const $router = useRouter()
@@ -308,7 +339,7 @@ export default defineComponent({
 </script>
 
 
-<style lang="less">
+<style lang="less" scoped>
 .header {
   display: flex;
   align-items: center;

@@ -5,21 +5,19 @@ const positionInstance = ckHttp.getInstance()
 function publicMethod(path:string, type:string, data?:any) {
     let result
     if ( type === 'get') {
-        console.log('get职位')
         result = positionInstance.get(path).then(res => {
-            console.log(res)
             return res
         })
-    } else if (type === 'post' || type === 'put') {
-        console.log('post添加、修改职位')
+    } else if (type === 'post') {
         result = positionInstance.post(path, data).then(res => {
-            console.log(res)
             return res
         })
-    } else if(type === 'delete') {
-        console.log('delete职位')
+    }else if (type === 'put') {
+        result = positionInstance.put(path, data).then(res => {
+            return res
+        })
+    }else if(type === 'delete') {
         result = positionInstance.delete(path).then(res => {
-            console.log(res)
             return res
         })
     }
@@ -29,7 +27,7 @@ function publicMethod(path:string, type:string, data?:any) {
 export function HTTPGetPosition() {
     return publicMethod('/api/position/queryAll', 'get')
 }
-export function HTTAddPosition(data:any) {
+export function HTTPAddPosition(data:any) {
     return publicMethod('/api/position/add', 'post' ,data)
 }
 export function HTTPUpdataPosition(data:any) {
@@ -37,4 +35,10 @@ export function HTTPUpdataPosition(data:any) {
 }
 export function HTTPDeletePosition(id:number ){
     return publicMethod(`/api/position/delete/${id}`, 'delete')
+}
+export function HTTPGetMenu() {
+    return publicMethod('/api/menu/queryAll', 'get')
+}
+export function HTTPGetPermission() {
+    return publicMethod('/api/permission/queryAll', 'get')
 }

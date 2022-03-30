@@ -8,7 +8,7 @@
     hoverable
   >
     <template #header-extra>
-      <n-button tertiary type="primary" @click="activate">
+      <n-button tertiary type="primary" @click="handleActivate(0)">
           添加职位
       </n-button>
     </template>
@@ -21,7 +21,7 @@
     <n-drawer v-model:show="active" :width="502">
       <n-drawer-content>
         <template #header>
-          Header
+          职位信息
         </template>
         <n-form >
           <n-form-item label='职位名称' >
@@ -29,28 +29,29 @@
 
             </n-input>
           </n-form-item>
-          <n-form-item label='职位所属部门'>
-            <n-select placeholder="请选择职位所属部门" v-model:value="form.departmentId" :options="options" clearable>
-
-            </n-select>
-          </n-form-item>
           <n-form-item label='菜单权限' >
-            <n-select placeholder="请选择职位菜单权限" v-model:value="form.menu" :options="options" clearable>
-
-            </n-select>
+            <n-tree-select
+              placeholder="请选择职位菜单权限"
+              multiple
+              default-expand-all
+              checkable
+              filterable
+              :clear-filter-after-select="false"
+              v-model:value="menuArray"
+              :options="menuOptions"
+              clearable
+            />
           </n-form-item>
           <n-form-item label='职位操作权限' >
-            <n-select placeholder="请选择职位操作权限" v-model:value="form.permission" :options="options" clearable>
-
+            <n-select placeholder="请选择职位操作权限"
+              multiple
+              v-model:value="permissionArray" :options="permissionOptions" clearable>
             </n-select>
           </n-form-item>
         </n-form>
         <n-button @click="addPosition" type="primary">
-          添加该职位
+          {{!actionType ? '添加' : '修改'}}
         </n-button>
-        <template #footer>
-          <n-button>Footer</n-button>
-        </template>
       </n-drawer-content>
     </n-drawer>
   </n-card>
@@ -61,26 +62,22 @@
 import { h, defineComponent, ref, reactive, onMounted } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
-const createColumns = ({ updataPosition, deletePosition }) => {
+const createColumns = ({ handleActivate, deletePosition }) => {
   return [
     {
       title: '职位名称',
       key: 'name'
     },
     {
-      title: '部门',
-      key: 'department.name'
-    },
-    {
       title: '职位菜单权限',
-      key: 'menu'
+      key: 'menu1'
     },
     {
       title: '职位操作权限',
-      key: 'permission'
+      key: 'permission1'
     },
     {
-      title: 'Action',
+      title: '操作',
       key: 'actions',
       render (row) {
         const button = [1,2].map((item) => {
@@ -92,7 +89,7 @@ const createColumns = ({ updataPosition, deletePosition }) => {
                             marginRight: '6px'
                         },
                         size: 'small',
-                        onClick: () => updataPosition(row)
+                        onClick: () => handleActivate(1,row)
                     },
                     
                     { default: () => '修改' }
@@ -121,82 +118,125 @@ const createColumns = ({ updataPosition, deletePosition }) => {
   ]
 }
 
-const createData = () => [
-  {
-    id: 0,
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer']
-  },
-  {
-    id: 1,
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['wow']
-  },
-  {
-    id: 2,
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher']
-  }
-]
-import { HTTPGetPosition, HTTAddPosition, HTTPUpdataPosition , HTTPDeletePosition } from './HttpPosition'
+
+import { HTTPGetPosition, HTTPAddPosition, HTTPUpdataPosition , HTTPDeletePosition, HTTPGetMenu, HTTPGetPermission } from './HttpPosition'
 
 // name，departmentId，menu，permission
 export default defineComponent({
   setup () {
-    const message = useMessage()
     const active = ref(false)
-    const activate = () => {
-      active.value = true
-    }
+    const actionType = ref(0) // 0增加 1修改
+    const data = ref([])
+    const menuOptions = ref([])
+    const permissionOptions = ref([])
+    const menuArray = ref([])
+    const permissionArray = ref([])
     const form = ref({
-      name: '',
-      departmentId: '',
-      menu: [],
-      permission: []
+      name: ''
     })
     onMounted(() => {
       getPosition()
+      getOptions()
     })
-//表格数据  GET     /position/queryAll/{pageNum}
-
+    const getOptions = () => {
+      HTTPGetMenu().then(res =>{
+        let n = 0
+        res.forEach(element => {
+          if(element.pid === 0){
+            n = n + 1
+            menuOptions.value.push({
+              key: element.id,
+              label: element.name,
+              children: []
+            })
+          }else{
+            menuOptions.value[n - 1].children.push({
+              key: element.id,
+              label: element.name
+            })
+          }
+          });
+      })
+      HTTPGetPermission().then( res =>{
+        res.forEach(element => {
+          permissionOptions.value.push({
+            value: element.id,
+            label: element.name
+            })
+          });
+      })
+    }
+    //表格数据  GET     /position/queryAll
     const getPosition =()=> {
-      HTTPGetPosition()
+      HTTPGetPosition().then(res =>{
+        data.value = res
+      })
     }
-//添加职位  Post    /position/add       json{name，departmentId，menu，permission}
-//修改     PUT     /position/update    json{id,name，departmentId，menu，permission}
+    //添加职位  Post  
+    //修改     PUT   
     const addPosition = () => {
-      HTTAddPosition(form)
+      console.log(menuArray.value)
+      form.value.menuId = menuArray.value
+      form.value.permissionId = permissionArray.value
+      console.log(form.value)
+      if( !actionType.value ) {
+        HTTPAddPosition(form.value).then(res =>{
+          if(res.code === 200){
+            getPosition()
+          }
+        })
+      } else {
+        HTTPUpdataPosition(form.value).then(res =>{
+          if(res.code === 200){
+            getPosition()
+          }
+        })
+      }
+      active.value = false
     }
-
-    const updataPosition = (item) => {
-      console.log(item)
-      HTTPUpdataPosition(form)
-    }
-//删除     Delete    /position/delete/{id}
-
+    //删除     Delete    /position/delete/{id}
     const deletePosition =(id) => {
       HTTPDeletePosition(id).then((res) => {
-         console.log(res)
-      }).catch(() => {
-          message.error('删除失败')
+         if(res.code === 200){
+           getPosition()
+         }
       })
+    }
+    const handleActivate= (type, item) => {
+      active.value = true
+      menuArray.value = []
+      permissionArray.value = []
+      if( type ) {
+        form.value = item
+        console.log(item)
+        form.value?.permission.forEach((item) => {
+          permissionArray.value.push(item.id)
+        })
+        form.value?.menu.forEach((item) => {
+          menuArray.value.push(item.id)
+        })
+        actionType.value = 1
+      } else {
+        form.value = {
+             name: ''
+        }
+        actionType.value = 0
+      } 
     }
     return {
       form,
+      actionType,
       addPosition,
-      updataPosition,
       deletePosition,
+      handleActivate,
+      menuOptions,
+      permissionOptions,
+      menuArray,
+      permissionArray,
       active,
-      activate,
-      data: createData(),
+      data,
       columns: createColumns({
-        updataPosition,
+        handleActivate,
         deletePosition,
       }),
       pagination: {

@@ -8,7 +8,7 @@
       hoverable
   >
     <template #header-extra>
-      <n-button tertiary type="primary" @click="handleActivate(0)">
+      <n-button tertiary type="primary" @click="handleActivate(0)" :disabled="isAuthPre('USER:INSERT')">
           添加员工
       </n-button>
     </template>
@@ -67,7 +67,7 @@
 
             </n-input>
           </n-form-item>
-          <n-form-item label='入职日期' >
+          <!-- <n-form-item label='入职日期' >
             <n-date-picker
               placeholder="请选择入职日期"
               v-model:formatted-value="form.beginDate"
@@ -75,7 +75,7 @@
               type="date"
               clearable
             />
-          </n-form-item>
+          </n-form-item> -->
         </n-form>
         <n-form> 
           <n-form-item label='所在部门' >
@@ -85,9 +85,8 @@
           </n-form-item>
           <n-form-item label='职位' >
             <n-select placeholder="请选择职位"
-      multiple
-      v-model:value="positonArray" :options="positionOptions">
-
+              multiple
+              v-model:value="positonArray" :options="positionOptions">
             </n-select>
           </n-form-item>
         </n-form>
@@ -105,10 +104,10 @@
 //添加员工  Post   /user/add       json{password，name，sex，birthday，idNumber，email，nativePlace，address，phone，departmentId，positionId}
 //修改  Put    /user/update    json{userId,password，name，sex，birthday，idNumber，email，nativePlace，address，phone，departmentId，positionId}
 //删除  Put  /user/delete/{userId}
-import { h, defineComponent, ref, onMounted } from 'vue'
+import { h, defineComponent, ref, onMounted, getCurrentInstance } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
-const createColumns = ({ handleActivate, deleteUser }) => {
+const createColumns = ({ handleActivate, deleteUser,isAuthPre }) => {
   return [
     {
       title: '员工号',
@@ -188,6 +187,7 @@ const createColumns = ({ handleActivate, deleteUser }) => {
                             marginRight: '6px'
                         },
                         size: 'small',
+                        disabled: isAuthPre('USER:UPDATE'),
                         onClick: () => handleActivate(1,row)
                     },
                     
@@ -204,6 +204,7 @@ const createColumns = ({ handleActivate, deleteUser }) => {
                                 },
                                 
                                 size: 'small',
+                                disabled:isAuthPre('USER:DELETE'),
                                 onClick: () => deleteUser(row.userId)
                             },
                             
@@ -221,7 +222,7 @@ const createColumns = ({ handleActivate, deleteUser }) => {
 import  { HTTPGetUser, HTTPAddUser, HTTPUpdataUser , HTTPDeleteUser, HTTPGetDepartment, HTTPGetPosition }from './HttpUser'
 export default defineComponent({
   setup () {
-    const message = useMessage()
+    const isAuthPre= getCurrentInstance()?.appContext.config.globalProperties.isAuthPer
     const active = ref(false)
     const actionType = ref(0) // 0增加 1修改
     const data = ref([])
@@ -279,7 +280,11 @@ export default defineComponent({
           }
         })
       } else {
-        HTTPUpdataUser(form.value)
+        HTTPUpdataUser(form.value).then(res =>{
+          if(res.code === 200){
+            getUser()
+          }
+        })
       }
       active.value = false
     }
@@ -313,6 +318,7 @@ export default defineComponent({
       } 
     }
     return {
+      isAuthPre,
       active,
       actionType,
       form,
@@ -326,6 +332,7 @@ export default defineComponent({
       columns: createColumns({
         handleActivate,
         deleteUser,
+        isAuthPre
       }),
       pagination: {
         pageSize: 10

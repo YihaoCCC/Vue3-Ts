@@ -4,18 +4,25 @@
         <n-avatar
             round
             size="small"
-            src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+            src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
     />
     <span class="name">
-        {{$store.state.name}}
+        {{name}}
     </span>
     </div>
     
   </n-dropdown>
+  <n-modal v-model:show="showModal" preset="dialog" title="Dialog">
+    <template #header>
+      <div>修改密码</div>
+    </template>
+    <password-form @successClick='showModal = false'></password-form>
+    
+  </n-modal>
 </template>
 
 <script lang="ts">
-import { h, defineComponent } from 'vue'
+import { h, defineComponent, ref } from 'vue'
 import type { Component } from 'vue'
 import { NIcon} from 'naive-ui'
 import {
@@ -24,6 +31,7 @@ import {
   LogOutOutline as LogoutIcon
 } from '@vicons/ionicons5'
 import {useRouter} from 'vue-router'
+import PasswordForm from './PasswordForm.vue'
 const renderIcon = (icon: Component) => {
   return () => {
     return h(NIcon, null, {
@@ -33,17 +41,21 @@ const renderIcon = (icon: Component) => {
 }
 
 export default defineComponent({
+  components: {
+    PasswordForm
+  },
   setup () {
     const router = useRouter()
+    const name = ref(localStorage.getItem('USERNAME'))
+    const showModal = ref(false)
+    const formRef = ref(null)
     return {
+      formRef,
+      name,
+      showModal,
       options: [
         {
-          label: '用户资料',
-          key: 'profile',
-          icon: renderIcon(UserIcon)
-        },
-        {
-          label: '编辑用户资料',
+          label: '修改密码',
           key: 'editProfile',
           icon: renderIcon(EditIcon)
         },
@@ -57,6 +69,8 @@ export default defineComponent({
         if ( key === 'logout') {
           localStorage.clear()
           router.push('/login')
+        } else {
+          showModal.value = true
         }
       }
     }

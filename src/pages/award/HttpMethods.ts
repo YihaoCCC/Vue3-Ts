@@ -39,5 +39,15 @@ export function HTTPAddInstitution(data:any) {
 export function HTTPUpdataInstitution(data:any) {
     return publicMethod('/api/jiangchengSystem/update','put',data)
 }
+export function HTTPGetUser(id:string) {
+    return  publicMethod(`/api/user/queryByJiangcheng/${id}`, 'get') 
+}
+export function HTTPGetAwardApprove() {
+    return  publicMethod('/api/jiangcheng/queryUnapproved', 'get') 
+}
+export function HTTPUpdataAwardApprove(id:number) {
+    return publicMethod(`/api/jiangcheng/update/${id}`,'put')
+}
+
 
 

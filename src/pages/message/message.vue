@@ -8,7 +8,7 @@
     hoverable
   >
     <template #header-extra>
-      <n-button tertiary type="primary" @click="handleActivate()">
+      <n-button tertiary type="primary" @click="handleActivate()" :disabled="isAuthPre('MESSAGE:INSERT')">
           添加公告
       </n-button>
     </template>
@@ -43,10 +43,10 @@
 //表格数据  GET     /message/queryAll
 //添加公告  Post    /message/add       json{content，userId，name}
 //删除     Delete    /message/delete/{id}
-import { h, defineComponent, ref, onMounted } from 'vue'
+import { h, defineComponent, ref, onMounted, getCurrentInstance } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
-const createColumns = ({ deleteMessage }) => {
+const createColumns = ({ deleteMessage,isAuthPre }) => {
   return [
     {
       title: '公告内容',
@@ -79,6 +79,7 @@ const createColumns = ({ deleteMessage }) => {
                             marginRight: '6px'
                         },
                         size: 'small',
+                        disabled:isAuthPre('MESSAGE:DELETE'),
                         onClick: () => deleteMessage(row.id)
                     },
                     
@@ -96,10 +97,10 @@ const createColumns = ({ deleteMessage }) => {
 import {HTTPGetMessage, HTTPAddMessage, HTTPDeleteMessage} from './HttpMethods'
 export default defineComponent({
   setup () {
+    const isAuthPre= getCurrentInstance()?.appContext.config.globalProperties.isAuthPer
     const active = ref(false)
     let form = ref({
       content:'',
-      userId:localStorage.getItem("USERID"),
       name: ''
     })
     const data = ref([])
@@ -114,12 +115,18 @@ export default defineComponent({
     }
     //添加 
     const addMessage = () => {
+      form.value.userId = localStorage.getItem("USERID")
+      form.value.name = localStorage.getItem("USERNAME")
       HTTPAddMessage(form.value).then(res =>{
           if(res.code === 200){
             getMessage()
           }
       })
       active.value = false
+      form.value = {
+          content:'',
+          name: ''
+      }
     }
     //删除
     const deleteMessage = (id) => {
@@ -133,13 +140,15 @@ export default defineComponent({
       active.value = true
     }
     return {
+      isAuthPre,
       form,
       active,
       addMessage,
       handleActivate,
       data,
       columns: createColumns({
-        deleteMessage
+        deleteMessage,
+        isAuthPre
       }),
       pagination: {
         pageSize: 10

@@ -24,17 +24,19 @@ function publicMethod(path:string, type:string, data?:any) {
     }
     return result
 }
-export function HTTPGetLeave(id:string) {
-    return  publicMethod(`/api/leave/query/${id}`, 'get') 
-}
-export function HTTPAddLeave(data:any) {
-    return publicMethod('/api/leave/add', 'post', data)
-}
-export function HTTPGetLeaveRequest(id:string) {
-    return  publicMethod(`/api/leave/queryUnapproved/${id}`, 'get') 
-}
-export function HTTPUpdataLeaveRequest(id:number) {
-    return publicMethod(`/api/leave/update/${id}`,'put')
+// export function HTTPGetDepartment() {
+//     return  publicMethod('/api/department/queryAll', 'get')
+// }
+export function HTTPAddSignIn(data:any) {
+    return publicMethod('/api/signIn/add', 'post', data)
 }
 
-
+export function HTTPGetUserTask(id:string) {
+    return  publicMethod(`/api/userTask/queryNoFinishByUserId/${id}`, 'get') 
+}
+// export function HTTPUpdataDepartMent(data:any) {
+//     return publicMethod('/api/department/update','put',data)
+// }
+// export function HTTPDeleteDepartment(id:number) {
+//     return publicMethod(`/api/department/delete/${id}`,'delete')
+// }

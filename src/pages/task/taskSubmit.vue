@@ -18,11 +18,23 @@
         <template #header>
           任务信息
         </template>
-        <n-form >
-          <n-form-item label='提交内容' >
+        <n-form label-placement="left"
+        label-width="auto">
+          <n-form-item label='任务名字：' >
+            {{form.task.name}}
+          </n-form-item>
+          <n-form-item label='任务内容：' >
+            {{form.task.content}}
+          </n-form-item>
+          <n-form-item label='任务要求：' >
+            {{form.task.taskWork}}
+          </n-form-item>
+          <n-form-item label='提交内容：' >
             <n-input placeholder="请输入提交内容" type='textarea' v-model:value="form.content" >
-
             </n-input>
+          </n-form-item>
+          <n-form-item label='任务意见：' >
+            {{form.view}}
           </n-form-item>
         </n-form>
         <n-button @click="submit" type="primary">
@@ -43,8 +55,24 @@ import { NTag, NButton, useMessage } from 'naive-ui'
 const createColumns = ({ handleActivate }) => {
   return [
     {
+      title:'任务名字',
+      key:'task.name'
+    },
+    {
       title: '任务内容',
-      key: 'task.content'
+      key: 'task.content',
+      width: 150,
+      ellipsis: {
+      tooltip: true
+    }
+    },
+    {
+      title: '任务要求',
+      key: 'taskWork',
+      width: 150,
+      ellipsis: {
+      tooltip: true
+    }
     },
     {
       title: '发布人员工号',
@@ -52,30 +80,38 @@ const createColumns = ({ handleActivate }) => {
     },
     {
       title: '发布人姓名',
-      key: 'task.name'
-    },
-    {
-      title: '任务所属部门',
-      key: 'task.department.name'
+      key: 'task.user.name'
     },
     {
       title: '开始时间',
       key: 'task.beginDate'
     },
     {
-      title: '提交的内容',
-      key: 'content'
-    },
-    {
       title: '结束时间',
       key: 'task.endDate'
+    },
+    {
+      title: '提交的内容',
+      key: 'content',
+      width: 150,
+      ellipsis: {
+      tooltip: true
+    }
+    },
+    {
+      title: '任务意见',
+      key: 'view',
+      width: 150,
+      ellipsis: {
+      tooltip: true
+    }
     },
     {
       title: '任务状态',
       key: 'state'
     },
     {
-      title: 'Action',
+      title: '操作',
       key: 'actions',
       render (row) {
         const button = [1].map((item) => {
@@ -101,7 +137,7 @@ const createColumns = ({ handleActivate }) => {
 }
 
 
-import {HTTPGetTaskSubmit, HTTPUpdateTaskSubmit} from './HttpMethods'
+import {HTTPGetUserTask, HTTPUpdateUserTask} from './HttpMethods'
 export default defineComponent({
   setup () {
     const active = ref(false)
@@ -110,20 +146,20 @@ export default defineComponent({
     })
     const data = ref([])
     onMounted(() => {
-      getTaskSubmit()
+      getUserTask()
     })
     //表格中的数据
-    const getTaskSubmit = () => {
+    const getUserTask = () => {
       let id = localStorage.getItem("USERID")
-      HTTPGetTaskSubmit(id).then(res => {
+      HTTPGetUserTask(id).then(res => {
         data.value = res
       })
     }
     //修改
     const submit = () => {
-      HTTPUpdateTaskSubmit(form.value).then(res =>{
+      HTTPUpdateUserTask(form.value).then(res =>{
           if(res.code === 200){
-            getTaskSubmit()
+            getUserTask()
           }
         })
       active.value = false
@@ -131,6 +167,7 @@ export default defineComponent({
     const handleActivate= (item) => {
       active.value = true
       form.value = item
+      console.log(form.value)
     }
     return {
       form,

@@ -121,12 +121,22 @@ export default defineComponent({
     }
     //添加 
     const addWorkOut = () => {
+      form.value.beginDate = form.value.date[0]
+      form.value.endDate = form.value.date[1]
+      form.value.userId = localStorage.getItem("USERID")
+      form.value.name = localStorage.getItem("USERNAME")
       console.log(form.value)
-      // HTTPAddLeave(form.value).then(res =>{
-      //     if(res.code === 200){
-      //       getLeave()
-      //     }
-      // })
+      HTTPAddWorkOut(form.value).then(res =>{
+          if(res.code === 200){
+            getWorkOut()
+          }
+      })
+      form.value = {
+          date:null,
+          beginDate: '',
+          endDate: '',
+          reason:''
+      }
       active.value = false
     }
     const handleActivate= () => {

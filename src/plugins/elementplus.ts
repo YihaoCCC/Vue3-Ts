@@ -2,14 +2,18 @@ import {App }from "vue";
 import {
     ElTable,
     ElTableColumn,
-    ElButton
+    ElButton,
+    ElAvatar,
+    ElDialog,
 }
 from 'element-plus'
 
 const component = [
     ElTable,
     ElTableColumn,
-    ElButton
+    ElButton,
+    ElAvatar,
+    ElDialog,
 ]
 
 export function useElementPlus(app:App):void {

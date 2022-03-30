@@ -11,7 +11,10 @@ const routes: RouteRecordRaw[]= [
             {
                 path: '/home',
                 name: 'home',
-                component: () => import('../pages/home/home.vue')
+                component: () => import('../pages/home/home.vue'),
+                meta: {
+                    label: '系统主页'
+                }
             },
             {
                 path: '/profile',
@@ -33,6 +36,11 @@ const routes: RouteRecordRaw[]= [
                  name: 'recordAward',
                  component: () => import('../pages/award/recordAward.vue')
              },
+             {
+                path: '/awardApprove',
+                name: 'awardApprove',
+                component: () => import('../pages/award/awardApprove.vue')
+            },
              {
                  path: '/institution',
                  name: 'institution',

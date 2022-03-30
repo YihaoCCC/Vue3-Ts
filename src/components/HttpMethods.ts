@@ -1,4 +1,4 @@
-import ckHttp from "../../service";
+import ckHttp from "../service";
 
 const instance = ckHttp.getInstance()
 
@@ -24,17 +24,10 @@ function publicMethod(path:string, type:string, data?:any) {
     }
     return result
 }
-export function HTTPGetLeave(id:string) {
-    return  publicMethod(`/api/leave/query/${id}`, 'get') 
+
+export function HTTPUpdatePassword(id:string,password:string) {
+    return publicMethod(`/api/user/password/${id}&${password}`,'put')
 }
-export function HTTPAddLeave(data:any) {
-    return publicMethod('/api/leave/add', 'post', data)
-}
-export function HTTPGetLeaveRequest(id:string) {
-    return  publicMethod(`/api/leave/queryUnapproved/${id}`, 'get') 
-}
-export function HTTPUpdataLeaveRequest(id:number) {
-    return publicMethod(`/api/leave/update/${id}`,'put')
-}
+
 
 

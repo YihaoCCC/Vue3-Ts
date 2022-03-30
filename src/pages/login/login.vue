@@ -70,6 +70,15 @@ export default {
                     console.log(res)
                     if(res.code === 200) {
                         localStorage.setItem('USERID', res.obj.userId)
+                        localStorage.setItem('USERNAME',res.obj.name)
+                        localStorage.setItem('DEPT', res.obj.department.name)
+                        localStorage.setItem('WORKDAY',res.obj.workDay)
+                        const positionname:any = []
+                        res.obj.position.map((item:any) => {
+                            positionname.push(item.name)
+                        })
+                        localStorage.setItem('POSITION', positionname)
+                        
                         let permission:any = []
                         res.obj.permission.forEach( (element:any) => {
                            permission.push( element.code )
@@ -80,7 +89,6 @@ export default {
                            menu.push( element.code )
                         });
                         localStorage.setItem('MENU', menu)
-                         console.log(formValue.username+formValue.password)
                         router.push('/home');
 
                     }

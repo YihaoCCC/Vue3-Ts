@@ -31,6 +31,9 @@ import {
   NRadio,
   NInputNumber,
   NTimePicker,
+  NTreeSelect,
+  NNotificationProvider,
+  NModal,
 } from 'naive-ui'
 
 
@@ -39,6 +42,7 @@ function setNavieUiComponents(app: {use:(naive:any) => void}):void {
         components: [
             NConfigProvider,
             NButton,
+            NModal,
             NScrollbar,
             NSpace,
             NLayout,
@@ -66,6 +70,8 @@ function setNavieUiComponents(app: {use:(naive:any) => void}):void {
             NRadio,
             NInputNumber,
             NTimePicker,
+            NTreeSelect,
+            NNotificationProvider,
         ]
       })
       app.use(naive)

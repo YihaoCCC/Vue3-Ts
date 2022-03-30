@@ -6,7 +6,7 @@ import store from "./store";
 import ckHttp from "./service";
 import  setNavieUiComponents from "./plugins/navieui";
 import { useElementPlus } from "./plugins/elementplus";
-//import 'element-plus/dist/index.css'
+import 'element-plus/dist/index.css'
 import 'animate.css';
 
 // 测试axios
@@ -16,14 +16,27 @@ const app = createApp(App)
 // 取消全局挂载，在CKhttp的实例中写一个 getinstance的方法把axios实例返回出去，供外部调用get等方法
 // app.config.globalProperties.$ckHttp = ckHttp
 
-app.config.globalProperties.isAuth = function (tag:number) {
+
+app.config.globalProperties.isAuthPer = function (tag:string) {
     let flag = true
-    console.log(tag)
-    
-    // let permisson = localStorage.getItem('permisson')
-    const permisson = ['USER:UPDATE',2,3]
-    let item
-    for ( item of permisson ) {
+    const permisson:any = localStorage.getItem('permission')
+    const permissionAaary = permisson.split(',') 
+   
+    for (const item of permissionAaary ) { 
+        if(item === tag) {
+            flag = false
+            break
+        }
+    }
+    return flag
+}
+
+app.config.globalProperties.isAuth = function (tag:string) {
+    let flag = true
+    const menu:any = localStorage.getItem('MENU')
+    const menuArray = menu.split(',')
+   
+    for (const item of menuArray ) { 
         if(item === tag) {
             flag = false
             break
