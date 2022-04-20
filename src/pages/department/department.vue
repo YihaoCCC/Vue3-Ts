@@ -23,19 +23,19 @@
         <template #header>
           部门信息
         </template>
-        <n-form :rules="rules">
-          <n-form-item label='部门名称' >
-            <n-input placeholder="请输入部门名称"  v-model:value="form.name" >
+        <n-form ref="formRef" :model="form" :rules="rules">
+          <n-form-item label='部门名称：' path="name" >
+            <n-input placeholder="请输入部门名称"  v-model:value="form.name" clearable>
 
             </n-input>
           </n-form-item>
-          <n-form-item label='部门邮箱'>
-            <n-input placeholder="请输入部门邮箱"  v-model:value="form.email">
+          <n-form-item label='部门邮箱：' path="email">
+            <n-input placeholder="请输入部门邮箱"  v-model:value="form.email" clearable>
 
             </n-input>
           </n-form-item>
-          <n-form-item label='部门描述' >
-            <n-input placeholder="请输入部门描述" type='textarea' v-model:value="form.describe">
+          <n-form-item label='部门描述：' path="describe">
+            <n-input placeholder="请输入部门描述" type='textarea' v-model:value="form.describe" clearable>
 
             </n-input>
           </n-form-item>
@@ -51,7 +51,7 @@
 
 <script>
 import { h, defineComponent, ref, onMounted } from 'vue'
-import { NTag, NButton, useMessage } from 'naive-ui'
+import { NTag, NButton, useMessage,  } from 'naive-ui'
 
 const createColumns = ({ handleActivate,deleteDepartment }) => {
   return [
@@ -68,6 +68,25 @@ const createColumns = ({ handleActivate,deleteDepartment }) => {
       key: 'describe'
     },
     {
+      title: '部门启用状态',
+      key: 'state',
+      render(row) {
+          return h(
+            NTag,
+            {
+              round: true,
+              style: {
+                marginRight: '6px',
+              },
+              type: row.state === '启用' ? 'success' : 'error'
+            },
+            {
+              default: () => row.state
+            }
+          )
+      }
+    },
+    {
       title: '操作',
       key: 'actions',
       render (row) {
@@ -76,6 +95,8 @@ const createColumns = ({ handleActivate,deleteDepartment }) => {
                 return h(
                     NButton,
                     {
+                        type: 'info',
+                        text: true,
                         style: {
                             marginRight: '6px'
                         },
@@ -90,7 +111,7 @@ const createColumns = ({ handleActivate,deleteDepartment }) => {
                             NButton,
                             {
                                 type: 'error',
-                                dashed: true,    
+                                text: true,   
                                 style: {
                                     marginRight: '6px',
                                 },
@@ -99,7 +120,7 @@ const createColumns = ({ handleActivate,deleteDepartment }) => {
                                 onClick: () => deleteDepartment(row.id)
                             },
                             
-                            { default: () => '删除' }
+                            { default: () => row.state === '启用' ? '停用' : '启用' }
                         )
                 }
         })
@@ -111,8 +132,11 @@ const createColumns = ({ handleActivate,deleteDepartment }) => {
 
 
 import {HTTPGetDepartment, HTTPAddDepartMent, HTTPUpdataDepartMent, HTTPDeleteDepartment} from './HttpMethods'
+import { tr } from 'element-plus/lib/locale'
 export default defineComponent({
   setup () {
+    const formRef = ref(null);
+    const message = useMessage()
     const active = ref(false)
     let form = ref({
           name: '',
@@ -123,6 +147,23 @@ export default defineComponent({
     onMounted(() => {
       getDepartment()
     })
+    const rules = ref({
+      name: {
+            required: true,
+            message: '请输入部门名称',
+            trigger: 'blur'
+          },
+      email: {
+            required: true,
+            message: '请输入部门邮箱',
+            trigger: ['input', 'blur']
+          },
+      describe: {
+            required: true,
+            message: '请输入部门描述',
+            trigger: ['input', 'blur']
+          }
+    })
     const actionType = ref(0)  // 0代表增加，1代表修改
     //表格中的数据  Get请求 /department/queryAll/{pageNum}
     const getDepartment = () => {
@@ -132,27 +173,41 @@ export default defineComponent({
     }
     //添加部门  Post   /department/add       json{name，email，describe}
     //修改部门  Put    /department/update    json{id,name，email，describe}
-    const addDepartment = () => {
-      if( !actionType.value ) {
-        HTTPAddDepartMent(form.value).then(res =>{
-          if(res.code === 200){
-            getDepartment()
+    const addDepartment = (e) => {
+      e.preventDefault()
+      formRef.value?.validate((errors) => {
+          if (!errors) {
+            if( !actionType.value ) {
+              HTTPAddDepartMent(form.value).then(res =>{
+                if(res.code === 200){
+                  getDepartment()
+                  message.success(res.message)
+                }else{
+                  message.error(res.message)
+                }
+              })
+            } else {
+              HTTPUpdataDepartMent(form.value).then(res =>{
+                if(res.code === 200){
+                  getDepartment()
+                  message.success(res.message)
+                }else{
+                  message.error(res.message)
+                }
+              })
+            }
+            active.value = false
           }
         })
-      } else {
-        HTTPUpdataDepartMent(form.value).then(res =>{
-          if(res.code === 200){
-            getDepartment()
-          }
-        })
-      }
-      active.value = false
     }
-    //删除部门  Delete  /department/delete/{id}
+    //停用部门  Delete  /department/delete/{id}
     const deleteDepartment = (id) => {
       HTTPDeleteDepartment(id).then(res =>{
           if(res.code === 200){
             getDepartment()
+            message.success(res.message)
+          }else{
+            message.error(res.message)
           }
         })
     }
@@ -171,6 +226,7 @@ export default defineComponent({
       } 
     }
     return {
+      formRef,
       form,
       actionType,
       addDepartment,
@@ -178,6 +234,7 @@ export default defineComponent({
       active,
       handleActivate,
       data,
+      rules,
       columns: createColumns({
         handleActivate,
         deleteDepartment

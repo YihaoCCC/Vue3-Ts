@@ -27,6 +27,9 @@ function publicMethod(path:string, type:string, data?:any) {
 export function HTTPGetSignRecord(id:string) {
     return  publicMethod(`/api/signIn/query/${id}`, 'get')
 }
+export function HTTPGetSignRecordSelective(data:any) {
+    return  publicMethod('/api/signIn/querySelective', 'post',data)
+}
 export function HTTPGetAttendanceType() {
     return  publicMethod('/api/signinSystem/queryAll', 'get')
 }
@@ -38,4 +41,7 @@ export function HTTPGetAttendanceTime() {
 }
 export function HTTPUpdAtaattendanceTime(data:any) {
     return publicMethod('/api/workTime/update','put',data)
+}
+export function HTTPGetDepartment() {
+    return  publicMethod('/api/department/queryUseAll', 'get')
 }

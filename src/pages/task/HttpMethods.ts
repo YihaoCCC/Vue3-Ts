@@ -27,6 +27,9 @@ function publicMethod(path:string, type:string, data?:any) {
 export function HTTPGetTask(id:string) {
     return  publicMethod(`/api/task/query/${id}`, 'get') 
 }
+export function HTTPGetTaskSelective(data:any) {
+    return  publicMethod('/api/task/querySelective', 'post',data) 
+}
 export function HTTPAddTask(data:any) {
     return publicMethod('/api/task/add', 'post', data)
 }
@@ -52,6 +55,9 @@ export function HTTPDeleteTaskUser(id:number) {
 
 export function HTTPGetUserTask(id:string) {
     return  publicMethod(`/api/userTask/queryByUserId/${id}`, 'get') 
+}
+export function HTTPGetUserTaskSelective(data:any) {
+    return  publicMethod('/api/userTask/queryByUserIdSelective', 'post',data) 
 }
 
 

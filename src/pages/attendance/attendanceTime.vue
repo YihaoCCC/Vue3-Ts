@@ -11,14 +11,14 @@
             <template #header>
               考勤时间制度信息
             </template>
-            <n-form >
-              <n-form-item label='考勤时间制度名称' >
-                <n-input  v-model:value="form.name">
-
-                </n-input>
+            <n-form ref="formRef" :model="form" :rules="rules">
+              <n-form-item label='考勤时间制度名称' path="name">
+                {{form.name}}
+                <!-- <n-input  v-model:value="form.name">
+                </n-input> -->
               </n-form-item>
-              <n-form-item label='时间' >
-                <n-time-picker v-model:formatted-value="form.time" value-format="HH:mm:ss" />
+              <n-form-item label='时间' path="time">
+                <n-time-picker v-model:formatted-value="form.time" value-format="HH:mm:ss" clearable/>
               </n-form-item>
             </n-form>
             <n-button @click="update" type="primary">
@@ -39,14 +39,15 @@ const createColumns = ({ handleActivate }) => {
   return [
     {
       title: '考勤时间制度名称',
-      key: 'name'
+      key: 'name',
+      width: 400
     },
     {
       title: '时间',
       key: 'time'
     },
     {
-      title: 'Action',
+      title: '操作',
       key: 'actions',
       render (row) {
         const button = [1].map((item) => {
@@ -54,6 +55,8 @@ const createColumns = ({ handleActivate }) => {
                 return h(
                     NButton,
                     {
+                        type: 'info',
+                        text: true,
                         style: {
                             marginRight: '6px'
                         },
@@ -75,12 +78,26 @@ const createColumns = ({ handleActivate }) => {
 import {HTTPGetAttendanceTime,HTTPUpdAtaattendanceTime} from './HttpMethods'
 export default defineComponent({
   setup () {
+    const formRef = ref(null)
+    const message = useMessage()
     const active = ref(false)
     let form = ref({
           name: '',
           time: null
     })
     const data = ref([])
+    const rules = ref({
+      name: {
+            required: true,
+            message: '请输入考勤时间制度名称',
+            trigger: ['input', 'blur']
+          },
+      time: {
+            required: true,
+            message: '请选择时间',
+            trigger: ['change', 'blur']
+          }
+    })
     onMounted(() => {
       getAttendanceTime()
     })
@@ -91,20 +108,29 @@ export default defineComponent({
       })
     }
     //修改
-    const update = () => {
-      HTTPUpdAtaattendanceTime(form.value).then(res =>{
-          if(res.code === 200){
-            getAttendanceTime()
-          }
+    const update = (e) => {
+      e.preventDefault()
+        formRef.value?.validate((errors) => {
+          if (!errors) {
+            HTTPUpdAtaattendanceTime(form.value).then(res =>{
+              if(res.code === 200){
+                getAttendanceTime()
+                message.success(res.message)
+              }else{
+                message.error(res.message)
+              }
+            })
+            active.value = false
+          } 
         })
-        active.value = false
     }
     const handleActivate = (item) => {
       active.value = true
       form.value = item
-      console.log(form.value)
     }
     return {
+      formRef,
+      rules,
       form,
       data,
       handleActivate,

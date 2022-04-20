@@ -34,6 +34,7 @@ import {
   NTreeSelect,
   NNotificationProvider,
   NModal,
+  NTag,
 } from 'naive-ui'
 
 
@@ -72,6 +73,7 @@ function setNavieUiComponents(app: {use:(naive:any) => void}):void {
             NTimePicker,
             NTreeSelect,
             NNotificationProvider,
+            NTag,
         ]
       })
       app.use(naive)

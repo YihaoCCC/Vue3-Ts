@@ -330,7 +330,7 @@ export default defineComponent({
       darkTheme,
       currentMenu,
       currentName,
-      theme: ref(true),
+      theme: ref(false),
       handleUpdateMenu,
       title: process.env.VUE_APP_TITLE
     }

@@ -1,6 +1,6 @@
 <template>
   <n-card
-    title="卡片分段示例"
+    title=" "
     :segmented="{
       content: true,
       footer: 'soft'
@@ -23,14 +23,13 @@
         <template #header>
           部门信息
         </template>
-        <n-form >
-          <n-form-item label='职位' >
-            <n-select placeholder="请选择职位" v-model:value="form.positionId" :options="positionOptions">
-
+        <n-form ref="formRef" :model="form" :rules="rules">
+          <n-form-item label='职位' path="positionId">
+            <n-select placeholder="请选择职位" v-model:value="form.positionId" :options="positionOptions" :disabled="actionType === 1 ? true:false" clearable>
             </n-select>
           </n-form-item>
-          <n-form-item label='每天薪资' >
-            <n-input-number placeholder="请输入每天薪资" v-model:value="form.money">
+          <n-form-item label='每天薪资' path="money">
+            <n-input-number placeholder="请输入每天薪资" v-model:value="form.money" clearable>
               <template #prefix>￥</template>
             </n-input-number>
           </n-form-item>
@@ -48,11 +47,10 @@
 //表格数据  GET     /salarySystem/queryAll
 //添加     Post    /salarySystem/add       json{positionId,money}
 //修改     PUT     /salarySystem/update    json{id,positionId,money}
-//删除     Delete    /salarySystem/delete/{id}
 import { h, defineComponent, ref, onMounted } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
-const createColumns = ({ handleActivate,deleteMoneyInstitution }) => {
+const createColumns = ({ handleActivate}) => {
   return [
     {
       title: '职位名称',
@@ -63,14 +61,16 @@ const createColumns = ({ handleActivate,deleteMoneyInstitution }) => {
       key: 'money'
     },
     {
-      title: 'Action',
+      title: '操作',
       key: 'actions',
       render (row) {
-        const button = [1,2].map((item) => {
+        const button = [1].map((item) => {
             if(item === 1) {
                 return h(
                     NButton,
                     {
+                        type: 'info',
+                        text: true,
                         style: {
                             marginRight: '6px'
                         },
@@ -80,23 +80,7 @@ const createColumns = ({ handleActivate,deleteMoneyInstitution }) => {
                     
                     { default: () => '修改' }
                 )
-            } else {
-                return h(
-                            NButton,
-                            {
-                                type: 'error',
-                                dashed: true,    
-                                style: {
-                                    marginRight: '6px',
-                                },
-                                
-                                size: 'small',
-                                onClick: () => deleteMoneyInstitution(row.id)
-                            },
-                            
-                            { default: () => '删除' }
-                        )
-                }
+            }
         })
         return button
       }
@@ -106,13 +90,29 @@ const createColumns = ({ handleActivate,deleteMoneyInstitution }) => {
 
 
 
-import {HTTPGetMoneyInstitution, HTTPAddMoneyInstitution, HTTPUpdataMoneyInstitution, HTTPDeleteMoneyInstitution,HTTPGetPosition} from './HttpMethods'
+import {HTTPGetMoneyInstitution, HTTPAddMoneyInstitution, HTTPUpdataMoneyInstitution,HTTPGetPosition} from './HttpMethods'
 export default defineComponent({
   setup () {
+    const formRef = ref(null)
+    const message = useMessage()
     const active = ref(false)
     let form = ref({
           positionId: null,
-          money: ''
+          money: 0
+    })
+    const rules = ref({
+      positionId: {
+            type: 'number',
+            required: true,
+            message: '请选择职位',
+            trigger: ['change', 'blur']
+          },
+      money: {
+            type: 'number',
+            required: true,
+            message: '请输入每天薪资',
+            trigger: ['input', 'blur']
+          }
     })
     const data = ref([])
     const positionOptions = ref([])
@@ -139,29 +139,32 @@ export default defineComponent({
     }
     //添加
     //修改
-    const addMoneyInstitution = () => {
-      if( !actionType.value ) {
-        HTTPAddMoneyInstitution(form.value).then(res =>{
-          if(res.code === 200){
-            getMoneyInstitution()
-          }
-        })
-      } else {
-        HTTPUpdataMoneyInstitution(form.value).then(res =>{
-          if(res.code === 200){
-            getMoneyInstitution()
-          }
-        })
-      }
-      active.value = false
-    }
-    //删除
-    const deleteMoneyInstitution = (id) => {
-      HTTPDeleteMoneyInstitution(id).then(res =>{
-          if(res.code === 200){
-            getMoneyInstitution()
-          }
-        })
+    const addMoneyInstitution = (e) => {
+      e.preventDefault()
+      formRef.value?.validate((errors) => {
+        if (!errors) {
+          if( !actionType.value ) {
+          HTTPAddMoneyInstitution(form.value).then(res =>{
+            if(res.code === 200){
+              getMoneyInstitution()
+              message.success(res.message)
+            }else{
+              message.error(res.message)
+            }
+          })
+        } else {
+          HTTPUpdataMoneyInstitution(form.value).then(res =>{
+            if(res.code === 200){
+              getMoneyInstitution()
+              message.success(res.message)
+            }else{
+              message.error(res.message)
+            }
+          })
+        }
+        active.value = false
+        }
+      })
     }
     const handleActivate= (type, item) => {
       active.value = true
@@ -171,23 +174,23 @@ export default defineComponent({
       } else {
         form.value = {
           positionId: null,
-          money: ''
+          money: 0
         }
         actionType.value = 0
       } 
     }
     return {
+      formRef,
+      rules,
       form,
       actionType,
       addMoneyInstitution,
-      deleteMoneyInstitution,
       positionOptions,
       active,
       handleActivate,
       data,
       columns: createColumns({
-        handleActivate,
-        deleteMoneyInstitution
+        handleActivate
       }),
       pagination: {
         pageSize: 10

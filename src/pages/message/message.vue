@@ -1,6 +1,6 @@
 <template>
 <n-card
-    title="卡片分段示例"
+    title=" "
     :segmented="{
       content: true,
       footer: 'soft'
@@ -8,7 +8,7 @@
     hoverable
   >
     <template #header-extra>
-      <n-button tertiary type="primary" @click="handleActivate()" :disabled="isAuthPre('MESSAGE:INSERT')">
+      <n-button tertiary type="primary" @click="handleActivate()" v-if="!isAuthPre('MESSAGE:INSERT')">
           添加公告
       </n-button>
     </template>
@@ -23,8 +23,8 @@
         <template #header>
           公告信息
         </template>
-        <n-form >
-          <n-form-item label='公告内容' >
+        <n-form ref="formRef" :model="form" :rules="rules">
+          <n-form-item label='公告内容' path="content">
             <n-input placeholder="请输入公告内容" type='textarea' v-model:value="form.content">
 
             </n-input>
@@ -41,7 +41,7 @@
     
 <script>
 //表格数据  GET     /message/queryAll
-//添加公告  Post    /message/add       json{content，userId，name}
+//添加公告  Post    /message/add       json{content，userId}
 //删除     Delete    /message/delete/{id}
 import { h, defineComponent, ref, onMounted, getCurrentInstance } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
@@ -50,7 +50,11 @@ const createColumns = ({ deleteMessage,isAuthPre }) => {
   return [
     {
       title: '公告内容',
-      key: 'content'
+      key: 'content',
+      width: 600,
+      // ellipsis: {
+      //   tooltip: true
+      // }
     },
     {
       title: '发布人员工号',
@@ -58,14 +62,14 @@ const createColumns = ({ deleteMessage,isAuthPre }) => {
     },
     {
       title: '发布人姓名',
-      key: 'name'
+      key: 'user.name'
     },
     {
       title: '发布时间',
       key: 'date'
     },
     {
-      title: 'Action',
+      title: '操作',
       key: 'actions',
       render (row) {
         const button = [1].map((item) => {
@@ -74,7 +78,7 @@ const createColumns = ({ deleteMessage,isAuthPre }) => {
                     NButton,
                     {
                         type: 'error',
-                        dashed: true,
+                        text: true, 
                         style: {
                             marginRight: '6px'
                         },
@@ -97,13 +101,22 @@ const createColumns = ({ deleteMessage,isAuthPre }) => {
 import {HTTPGetMessage, HTTPAddMessage, HTTPDeleteMessage} from './HttpMethods'
 export default defineComponent({
   setup () {
+    const formRef = ref(null)
+    const message = useMessage()
     const isAuthPre= getCurrentInstance()?.appContext.config.globalProperties.isAuthPer
     const active = ref(false)
     let form = ref({
-      content:'',
-      name: ''
+      userId:localStorage.getItem("USERID"),
+      content:''
     })
     const data = ref([])
+    const rules = ref({
+      content: {
+            required: true,
+            message: '请输入公告内容',
+            trigger: ['input', 'blur']
+          }
+    })
     onMounted(() => {
       getMessage()
     })
@@ -114,25 +127,34 @@ export default defineComponent({
       })
     }
     //添加 
-    const addMessage = () => {
-      form.value.userId = localStorage.getItem("USERID")
-      form.value.name = localStorage.getItem("USERNAME")
-      HTTPAddMessage(form.value).then(res =>{
-          if(res.code === 200){
-            getMessage()
+    const addMessage = (e) => {
+      e.preventDefault()
+      formRef.value?.validate((errors) => {
+        if (!errors) {
+          HTTPAddMessage(form.value).then(res =>{
+            if(res.code === 200){
+              getMessage()
+              message.success(res.message)
+            }else{
+              message.error(res.message)
+            }
+          })
+          active.value = false
+          form.value = {
+              userId:localStorage.getItem("USERID"),
+              content:''
           }
+        }
       })
-      active.value = false
-      form.value = {
-          content:'',
-          name: ''
-      }
     }
     //删除
     const deleteMessage = (id) => {
       HTTPDeleteMessage(id).then(res =>{
           if(res.code === 200){
             getMessage()
+            message.success(res.message)
+          }else{
+            message.error(res.message)
           }
         })
     }
@@ -140,6 +162,8 @@ export default defineComponent({
       active.value = true
     }
     return {
+      formRef,
+      rules,
       isAuthPre,
       form,
       active,

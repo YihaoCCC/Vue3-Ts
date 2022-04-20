@@ -1,6 +1,6 @@
 <template>
   <n-card
-    title="卡片分段示例"
+    title=" "
     :segmented="{
       content: true,
       footer: 'soft'
@@ -23,13 +23,13 @@
         <template #header>
           职位信息
         </template>
-        <n-form >
-          <n-form-item label='职位名称' >
+        <n-form ref="formRef" :model="form" :rules="rules">
+          <n-form-item label='职位名称：' path="name">
             <n-input placeholder="请输入职位名称" v-model:value="form.name"   >
 
             </n-input>
           </n-form-item>
-          <n-form-item label='菜单权限' >
+          <n-form-item label='职位菜单权限：' path="menuId">
             <n-tree-select
               placeholder="请选择职位菜单权限"
               multiple
@@ -37,15 +37,15 @@
               checkable
               filterable
               :clear-filter-after-select="false"
-              v-model:value="menuArray"
+              v-model:value="form.menuId"
               :options="menuOptions"
               clearable
             />
           </n-form-item>
-          <n-form-item label='职位操作权限' >
+          <n-form-item label='职位操作权限：' path="permissionId">
             <n-select placeholder="请选择职位操作权限"
               multiple
-              v-model:value="permissionArray" :options="permissionOptions" clearable>
+              v-model:value="form.permissionId" :options="permissionOptions" clearable>
             </n-select>
           </n-form-item>
         </n-form>
@@ -69,12 +69,23 @@ const createColumns = ({ handleActivate, deletePosition }) => {
       key: 'name'
     },
     {
-      title: '职位菜单权限',
-      key: 'menu1'
-    },
-    {
-      title: '职位操作权限',
-      key: 'permission1'
+      title: '职位启用状态',
+      key: 'state',
+      render(row) {
+          return h(
+            NTag,
+            {
+              round: true,
+              style: {
+                marginRight: '6px',
+              },
+              type: row.state === '启用' ? 'success' : 'error'
+            },
+            {
+              default: () => row.state
+            }
+          )
+      }
     },
     {
       title: '操作',
@@ -85,6 +96,8 @@ const createColumns = ({ handleActivate, deletePosition }) => {
                 return h(
                     NButton,
                     {
+                        type: 'info',
+                        text: true,
                         style: {
                             marginRight: '6px'
                         },
@@ -99,7 +112,7 @@ const createColumns = ({ handleActivate, deletePosition }) => {
                             NButton,
                             {
                                 type: 'error',
-                                dashed: true,    
+                                text: true,    
                                 style: {
                                     marginRight: '6px',
                                 },
@@ -108,7 +121,7 @@ const createColumns = ({ handleActivate, deletePosition }) => {
                                 onClick: () => deletePosition(row.id)
                             },
                             
-                            { default: () => '删除' }
+                            { default: () => row.state === '启用' ? '停用' : '启用' }
                         )
                 }
         })
@@ -124,6 +137,8 @@ import { HTTPGetPosition, HTTPAddPosition, HTTPUpdataPosition , HTTPDeletePositi
 // name，departmentId，menu，permission
 export default defineComponent({
   setup () {
+    const formRef = ref(null);
+    const message = useMessage()
     const active = ref(false)
     const actionType = ref(0) // 0增加 1修改
     const data = ref([])
@@ -132,11 +147,32 @@ export default defineComponent({
     const menuArray = ref([])
     const permissionArray = ref([])
     const form = ref({
-      name: ''
+      name: '',
+      menuId:[],
+      permissionId:[]
     })
     onMounted(() => {
       getPosition()
       getOptions()
+    })
+    const rules = ref({
+      name: {
+            required: true,
+            message: '请输入职位名称',
+            trigger: 'blur'
+          },
+      menuId: {
+            type: 'array',
+            required: true,
+            message: '请选择职位菜单权限',
+            trigger: ['change', 'blur']
+          },
+      permissionId: {
+            type: 'array',
+            required: true,
+            message: '请选择职位操作权限',
+            trigger: ['change', 'blur']
+          }
     })
     const getOptions = () => {
       HTTPGetMenu().then(res =>{
@@ -174,32 +210,44 @@ export default defineComponent({
     }
     //添加职位  Post  
     //修改     PUT   
-    const addPosition = () => {
-      console.log(menuArray.value)
-      form.value.menuId = menuArray.value
-      form.value.permissionId = permissionArray.value
+    const addPosition = (e) => {
+      e.preventDefault()
       console.log(form.value)
-      if( !actionType.value ) {
-        HTTPAddPosition(form.value).then(res =>{
-          if(res.code === 200){
-            getPosition()
+      formRef.value?.validate((errors) => {
+          if (!errors) {
+            if( !actionType.value ) {
+              HTTPAddPosition(form.value).then(res =>{
+                if(res.code === 200){
+                  getPosition()
+                  message.success(res.message)
+                }else{
+                  message.error(res.message)
+                }
+              })
+            } else {
+              HTTPUpdataPosition(form.value).then(res =>{
+                if(res.code === 200){
+                  getPosition()
+                  message.success(res.message)
+                }else{
+                  message.error(res.message)
+                }
+              })
+            }
+            active.value = false
           }
         })
-      } else {
-        HTTPUpdataPosition(form.value).then(res =>{
-          if(res.code === 200){
-            getPosition()
-          }
-        })
-      }
-      active.value = false
+      
     }
-    //删除     Delete    /position/delete/{id}
+    //停用     Delete    /position/delete/{id}
     const deletePosition =(id) => {
       HTTPDeletePosition(id).then((res) => {
          if(res.code === 200){
            getPosition()
-         }
+           message.success(res.message)
+         }else{
+            message.error(res.message)
+          }
       })
     }
     const handleActivate= (type, item) => {
@@ -212,18 +260,25 @@ export default defineComponent({
         form.value?.permission.forEach((item) => {
           permissionArray.value.push(item.id)
         })
+        form.value.permissionId = permissionArray.value
         form.value?.menu.forEach((item) => {
           menuArray.value.push(item.id)
         })
+        form.value.menuId = menuArray.value
+        console.log(form.value)
         actionType.value = 1
       } else {
         form.value = {
-             name: ''
+             name: '',
+             menuId:[],
+             permissionId:[]
         }
         actionType.value = 0
       } 
     }
     return {
+      formRef,
+      rules,
       form,
       actionType,
       addPosition,

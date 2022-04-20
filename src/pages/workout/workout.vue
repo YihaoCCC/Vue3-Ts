@@ -7,6 +7,27 @@
     }"
     hoverable
   >
+  <template #header>
+    <n-form inline label-placement="left" >
+      <n-form-item label='部门：' v-if="!isAuthPre('TRAVEL_RECORD:SELECTALL')">
+        <n-select placeholder="请选择部门" v-model:value="form1.departmentId" :options="departmentOptions" clearable style="width: 180px">
+        </n-select>
+      </n-form-item>
+      <n-form-item label='员工姓名：' v-if="!isAuthPre('TRAVEL_RECORD:SELECTALL') || !isAuthPre('TRAVEL_RECORD:SELECTDEPT')">
+        <n-input placeholder="请输入员工姓名"  v-model:value="form1.userName" clearable>
+        </n-input>
+      </n-form-item>
+      <n-form-item label='审批状态:' >
+        <n-select placeholder="请选择审批状态" v-model:value="form1.state" :options="stateOptions" clearable style="width: 135px">
+        </n-select>
+      </n-form-item>
+      <n-form-item>
+      <n-button tertiary type="primary" @click="query">
+        查询
+      </n-button>
+    </n-form-item>
+    </n-form>
+  </template>
     <template #header-extra>
       <n-button tertiary type="primary" @click="handleActivate()">
           申请出差
@@ -23,12 +44,12 @@
         <template #header>
           出差记录信息
         </template>
-        <n-form> 
-          <n-form-item label='出差时间' >
+        <n-form ref="formRef" :model="form" :rules="rules"> 
+          <n-form-item label='出差时间' path="date">
             <n-date-picker v-model:formatted-value="form.date" value-format="yyyy-MM-dd" type="daterange" clearable />
           </n-form-item>
-          <n-form-item label='出差原因' >
-             <n-input placeholder="请输入出差原因"  v-model:value="form.reason">
+          <n-form-item label='出差原因' path="reason">
+             <n-input placeholder="请输入出差原因" type='textarea'  v-model:value="form.reason" clearable>
 
             </n-input>
           </n-form-item>
@@ -45,7 +66,7 @@
 <script>
 //表格数据  GET     /travel/query/{userId}
 //添加  Post    /travel/add       json{userId，name，reason，beginDate，endDate}
-import { h, defineComponent, ref, onMounted } from 'vue'
+import { h, defineComponent, ref, onMounted,getCurrentInstance } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
 const createColumns = () => {
@@ -56,11 +77,19 @@ const createColumns = () => {
     },
     {
       title: '员工姓名',
-      key: 'name'
+      key: 'user.name'
+    },
+    {
+      title: '部门',
+      key: 'user.department.name'
     },
     {
       title: '出差原因',
-      key: 'reason'
+      key: 'reason',
+      width: 500,
+      // ellipsis: {
+      //   tooltip: true
+      // }
     },
     {
       title: '开始时间',
@@ -72,46 +101,94 @@ const createColumns = () => {
     },
     {
       title: '审批状态',
-      key: 'state'
+      key: 'state',
+      render(row) {
+          return h(
+            NTag,
+            {
+              round: true,
+              style: {
+                marginRight: '6px',
+              },
+              type: row.state === '批准' ? 'success' : 'error'
+            },
+            {
+              default: () => row.state
+            }
+          )
+      }
     }
-    // {
-    //   title: '审批状态',
-    //   key: 'tags',
-    //   render (row) {
-    //     const tags = row.tags.map((tagKey) => {
-    //       return h(
-    //         NTag,
-    //         {
-    //           style: {
-    //             marginRight: '6px'
-    //           },
-    //           type: 'info'
-    //         },
-    //         {
-    //           default: () => tagKey
-    //         }
-    //       )
-    //     })
-    //     return tags
-    //   }
-    // }
   ]
 }
 
-import {HTTPGetWorkOut, HTTPAddWorkOut} from './HttpMethods'
+import {HTTPGetWorkOut, HTTPAddWorkOut,HTTPGetDepartment,HTTPGetWorkOutSelective} from './HttpMethods'
 export default defineComponent({
   setup () {
+    const formRef = ref(null)
+    const message = useMessage()
+    const isAuthPre= getCurrentInstance()?.appContext.config.globalProperties.isAuthPer
     const active = ref(false)
     let form = ref({
-          date:null,
-          beginDate: '',
-          endDate: '',
-          reason:''
+      userId:localStorage.getItem("USERID"),
+      date:null,
+      beginDate: '',
+      endDate: '',
+      reason:''
     })
+    const form1 = ref({
+      userId:localStorage.getItem('USERID'),
+      userName: null,
+      departmentId:null,
+      state:null
+    })
+    const departmentOptions = ref([])
+    const stateOptions = ref([
+      {
+        value:"批准",
+        label:"批准"
+      },
+      {
+        value:"未批准",
+        label:"未批准"
+      },
+    ])
     const data = ref([])
+    const rules = ref({
+      date: {
+            type: 'array',
+            required: true,
+            message: '请选择请假时间',
+            trigger: ['change', 'blur']
+          },
+      reason: {
+            required: true,
+            message: '请输入请假原因',
+            trigger: ['input', 'blur']
+          }
+    })
     onMounted(() => {
       getWorkOut()
+      getOptions()
     })
+    const query = () => {
+      console.log(form1.value)
+      if(form1.value.userName === ''){
+        form1.value.userName = null
+      }
+      HTTPGetWorkOutSelective(form1.value).then(res =>{
+        data.value = res
+      })
+    }
+    const getOptions = () => {
+      HTTPGetDepartment().then(res =>{
+        res.forEach(element => {
+          departmentOptions.value.push({
+            value: element.id,
+            label: element.name
+            })
+          });
+      })
+    }
     //表格中的数据
     const getWorkOut = () => {
       let id = localStorage.getItem("USERID")
@@ -120,32 +197,47 @@ export default defineComponent({
       })
     }
     //添加 
-    const addWorkOut = () => {
-      form.value.beginDate = form.value.date[0]
-      form.value.endDate = form.value.date[1]
-      form.value.userId = localStorage.getItem("USERID")
-      form.value.name = localStorage.getItem("USERNAME")
-      console.log(form.value)
-      HTTPAddWorkOut(form.value).then(res =>{
-          if(res.code === 200){
-            getWorkOut()
+    const addWorkOut = (e) => {
+      e.preventDefault()
+        formRef.value?.validate((errors) => {
+          if (!errors) {
+            form.value.beginDate = form.value.date[0]
+            form.value.endDate = form.value.date[1]
+            console.log(form.value)
+            HTTPAddWorkOut(form.value).then(res =>{
+                if(res.code === 200){
+                  getWorkOut()
+                  message.success(res.message)
+                }else{
+                  message.error(res.message)
+                }
+            })
+            form.value = {
+                userId:localStorage.getItem("USERID"),
+                date:null,
+                beginDate: '',
+                endDate: '',
+                reason:''
+            }
+            console.log(form.value)
+            active.value = false
           }
-      })
-      form.value = {
-          date:null,
-          beginDate: '',
-          endDate: '',
-          reason:''
-      }
-      active.value = false
+        })
     }
     const handleActivate= () => {
       active.value = true
     }
     return {
+      formRef,
+      rules,
+      isAuthPre,
       form,
+      form1,
       active,
       data,
+      departmentOptions,
+      stateOptions,
+      query,
       addWorkOut,
       handleActivate,
       columns: createColumns({

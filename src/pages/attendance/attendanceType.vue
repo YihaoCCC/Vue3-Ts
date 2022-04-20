@@ -11,14 +11,14 @@
             <template #header>
               考勤类型制度信息
             </template>
-            <n-form >
-              <n-form-item label='考勤类型制度名称' >
-                <n-input  v-model:value="form.name">
-
-                </n-input>
+            <n-form ref="formRef" :model="form" :rules="rules">
+              <n-form-item label='考勤类型制度名称：' path="name">
+                {{form.name}}
+                <!-- <n-input  v-model:value="form.name" disabled>
+                </n-input> -->
               </n-form-item>
-              <n-form-item label='奖罚金额' >
-                <n-input-number placeholder="请输入奖罚金额" v-model:value="form.money">
+              <n-form-item label='奖罚金额：' path="money">
+                <n-input-number placeholder="请输入奖罚金额" v-model:value="form.money" clearable>
                   <template #prefix>￥</template>
                 </n-input-number>
               </n-form-item>
@@ -41,14 +41,15 @@ const createColumns = ({ handleActivate }) => {
   return [
     {
       title: '考勤类型制度名称',
-      key: 'name'
+      key: 'name',
+      width: 400
     },
     {
       title: '奖罚金额',
       key: 'money'
     },
     {
-      title: 'Action',
+      title: '操作',
       key: 'actions',
       render (row) {
         const button = [1].map((item) => {
@@ -56,6 +57,8 @@ const createColumns = ({ handleActivate }) => {
                 return h(
                     NButton,
                     {
+                        type: 'info',
+                        text: true,
                         style: {
                             marginRight: '6px'
                         },
@@ -77,12 +80,27 @@ const createColumns = ({ handleActivate }) => {
 import {HTTPGetAttendanceType,HTTPUpdAtaattendanceType} from './HttpMethods'
 export default defineComponent({
   setup () {
+    const formRef = ref(null)
+    const message = useMessage()
     const active = ref(false)
     let form = ref({
           name: '',
           money: ''
     })
     const data = ref([])
+    const rules = ref({
+      name: {
+            required: true,
+            message: '请输入考勤类型制度名称',
+            trigger: ['input', 'blur']
+          },
+      money: {
+            type: 'number',
+            required: true,
+            message: '请输入奖罚金额',
+            trigger: ['input', 'blur']
+          }
+    })
     onMounted(() => {
       getAttendanceType()
     })
@@ -93,19 +111,30 @@ export default defineComponent({
       })
     }
     //修改
-    const update = () => {
-      HTTPUpdAtaattendanceType(form.value).then(res =>{
-          if(res.code === 200){
-            getAttendanceType()
-          }
+    const update = (e) => {
+      e.preventDefault()
+        formRef.value?.validate((errors) => {
+          if (!errors) {
+            HTTPUpdAtaattendanceType(form.value).then(res =>{
+              if(res.code === 200){
+                getAttendanceType()
+                message.success(res.message)
+              }else{
+                message.error(res.message)
+              }
+            })
+            active.value = false
+          } 
         })
-        active.value = false
+     
     }
     const handleActivate = (item) => {
       active.value = true
       form.value = item
     }
     return {
+      formRef,
+      rules,
       form,
       data,
       handleActivate,

@@ -7,6 +7,23 @@
     }"
     hoverable
   >
+  <template #header>
+    <n-form inline label-placement="left" >
+      <n-form-item label='任务名字：'>
+        <n-input placeholder="请输入任务名字"  v-model:value="form3.name" clearable style="width: 145px">
+        </n-input>
+      </n-form-item>
+      <n-form-item label='任务状态:' >
+        <n-select placeholder="请选择任务状态" v-model:value="form3.state" :options="stateOptions" clearable style="width: 135px">
+        </n-select>
+      </n-form-item>
+      <n-form-item>
+      <n-button tertiary type="primary" @click="query">
+        查询
+      </n-button>
+    </n-form-item>
+    </n-form>
+  </template>
     <template #header-extra>
       <n-button tertiary type="primary" @click="handleActivate(0)">
           添加任务
@@ -23,17 +40,23 @@
         <template #header>
           任务信息
         </template>
-        <n-form >
-          <n-form-item label='任务名字' >
-            <n-input placeholder="请输入任务名字" v-model:value="form.name" >
+        <n-form ref="formRef" :model="form" :rules="rules">
+          <n-form-item label='任务名字：' path="name">
+            <n-input placeholder="请输入任务名字：" v-model:value="form.name" >
             </n-input>
           </n-form-item>
-          <n-form-item label='任务内容' >
+          <n-form-item label='任务内容：' path="content">
             <n-input placeholder="请输入任务内容" type='textarea' v-model:value="form.content" >
             </n-input>
           </n-form-item>
-          <n-form-item label='任务时间'>
+          <n-form-item label='任务时间：' path="date">
             <n-date-picker v-model:formatted-value="form.date" value-format="yyyy-MM-dd" type="daterange" clearable />
+          </n-form-item>
+          <n-form-item label='任务状态：' path="state">
+            <n-radio-group v-model:value="form.state" name="radiogroup">
+              <n-radio value="完成">完成</n-radio>
+              <n-radio value='未完成'>未完成</n-radio>
+            </n-radio-group>
           </n-form-item>
         </n-form>
         <n-button @click="addTask" type="primary">
@@ -47,12 +70,12 @@
         <template #header>
           添加员工
         </template>
-        <n-form >
-          <n-form-item label='员工姓名' >
+        <n-form ref="formRef1" :model="form1" :rules="rules1">
+          <n-form-item label='员工' path="userId">
             <n-select placeholder="请选择员工" v-model:value="form1.userId" :options="userOptions">
             </n-select>
           </n-form-item>
-          <n-form-item label='任务要求' >
+          <n-form-item label='任务要求' path="taskWork">
             <n-input placeholder="请输入任务要求" type='textarea' v-model:value="form1.taskWork" >
             </n-input>
           </n-form-item>
@@ -62,6 +85,8 @@
         </n-button>
       </n-drawer-content>
     </n-drawer>
+    <br/>
+    <br/>
     <n-card
     v-if="active2"
     title="任务员工详情"
@@ -82,26 +107,27 @@
         <template #header>
           任务信息
         </template>
-        <n-form 
+        <n-form ref="formRef2" :model="form2" :rules="rules2"
         label-placement="left"
         label-width="auto">
-          <n-form-item label='员工号：' >
+          <n-form-item label='员工号：' path="userId">
             {{form2.userId}}
           </n-form-item>
-          <n-form-item label='员工姓名：' >
+          <n-form-item label='员工姓名：' path="user.name">
             {{form2.user.name}}
           </n-form-item>
-          <n-form-item label='任务要求：' >
-            {{form2.taskWork}}
+          <n-form-item label='任务要求：' path="taskWork">
+            <n-input placeholder="请输入任务要求" type='textarea' v-model:value="form2.taskWork" >
+            </n-input>
           </n-form-item>
-          <n-form-item label='任务提交的内容：' >
+          <n-form-item label='任务提交的内容：' path="content">
             {{form2.content}}
           </n-form-item>
-          <n-form-item label='任务意见：' >
+          <n-form-item label='任务意见：' path="view">
             <n-input placeholder="请输入任务意见" type='textarea' v-model:value="form2.view" >
             </n-input>
           </n-form-item>
-          <n-form-item label='任务状态：'>
+          <n-form-item label='任务状态：' path="state">
             <n-radio-group v-model:value="form2.state" name="radiogroup">
               <n-radio value="完成">完成</n-radio>
               <n-radio value='未完成'>未完成</n-radio>
@@ -131,11 +157,19 @@ const createColumns = ({ handleActivate,handleActivate1,show }) => {
   return [
     {
       title: '任务名字',
-      key: 'name'
+      key: 'name',
+      width: 150,
+      // ellipsis: {
+      //   tooltip: true
+      // }
     },
     {
       title: '任务内容',
-      key: 'content'
+      key: 'content',
+      width: 500,
+      // ellipsis: {
+      //   tooltip: true
+      // }
     },
     {
       title: '开始时间',
@@ -147,10 +181,25 @@ const createColumns = ({ handleActivate,handleActivate1,show }) => {
     },
     {
       title: '任务状态',
-      key: 'state'
+      key: 'state',
+      render(row) {
+          return h(
+            NTag,
+            {
+              round: true,
+              style: {
+                marginRight: '6px',
+              },
+              type: row.state === '完成' ? 'success' : 'error'
+            },
+            {
+              default: () => row.state
+            }
+          )
+      }
     },
     {
-      title: 'Action',
+      title: '操作',
       key: 'actions',
       render (row) {
         const button = [1,2,3].map((item) => {
@@ -158,7 +207,8 @@ const createColumns = ({ handleActivate,handleActivate1,show }) => {
                 return h(
                     NButton,
                     {
-                        
+                        type: 'info',
+                        text: true,
                         style: {
                             marginRight: '6px'
                         },
@@ -172,6 +222,8 @@ const createColumns = ({ handleActivate,handleActivate1,show }) => {
                 return h(
                     NButton,
                     {
+                        type: 'info',
+                        text: true,
                         style: {
                             marginRight: '6px'
                         },
@@ -185,7 +237,8 @@ const createColumns = ({ handleActivate,handleActivate1,show }) => {
                 return h(
                             NButton,
                             {
-                                  
+                                type: 'info',
+                                text: true,
                                 style: {
                                     marginRight: '6px',
                                 },
@@ -215,27 +268,46 @@ const createColumns1 = ({ handleActivate2,deleteUser }) => {
     },
     {
       title: '任务要求',
-      key: 'taskWork'
+      key: 'taskWork',
+      width: 300,
+      // ellipsis: {
+      //   tooltip: true
+      // }
     },
     {
       title: '任务提交内容',
       key: 'content',
-      width: 200,
-      ellipsis: {
-      tooltip: true
-    }
+      width: 300,
+      // ellipsis: {
+      //   tooltip: true
+      // }
     },
     {
       title: '任务意见',
       key: 'view',
-      width: 200,
-      ellipsis: {
-      tooltip: true
-    }
+      width: 300,
+      // ellipsis: {
+      //   tooltip: true
+      // }
     },
     {
       title: '任务状态',
-      key: 'state'
+      key: 'state',
+      render(row) {
+          return h(
+            NTag,
+            {
+              round: true,
+              style: {
+                marginRight: '6px',
+              },
+              type: row.state === '完成' ? 'success' : 'error'
+            },
+            {
+              default: () => row.state
+            }
+          )
+      }
     },
     {
       title: '操作',
@@ -246,7 +318,8 @@ const createColumns1 = ({ handleActivate2,deleteUser }) => {
                 return h(
                     NButton,
                     {
-                        
+                        type: 'info',
+                        text: true,
                         style: {
                             marginRight: '6px'
                         },
@@ -260,7 +333,8 @@ const createColumns1 = ({ handleActivate2,deleteUser }) => {
                 return h(
                             NButton,
                             {
-                                  
+                                type: 'info',
+                                text: true,
                                 style: {
                                     marginRight: '6px',
                                 },
@@ -279,28 +353,96 @@ const createColumns1 = ({ handleActivate2,deleteUser }) => {
   ]
 }
 
-import {HTTPGetTask, HTTPAddTask, HTTPUpdateTask,HTTPGetUser,HTTPAddUserTask,HTTPGetTaskUser,HTTPUpdateUserTask,HTTPDeleteTaskUser} from './HttpMethods'
+import {HTTPGetTask, HTTPAddTask, HTTPUpdateTask,HTTPGetUser,HTTPAddUserTask,HTTPGetTaskUser,HTTPUpdateUserTask,HTTPDeleteTaskUser,HTTPGetTaskSelective} from './HttpMethods'
 export default defineComponent({
   setup () {
+    const formRef = ref(null)
+    const formRef1 = ref(null)
+    const formRef2 = ref(null)
+    const message = useMessage()
     const active = ref(false)
     const active1 = ref(false)
     const active2 = ref(false)
     const active3 = ref(false)
-    let form = ref({
+    const form = ref({
       name:'',
       beginDate:null,
       endDate:null,
       content:'',
-      date:null
+      date:null,
+      state:''
     })
-    let form1 = ref({
+    const rules = ref({
+      name: {
+            required: true,
+            message: '请输入任务名字',
+            trigger: ['input', 'blur']
+          },
+      content: {
+            required: true,
+            message: '请输入任务内容',
+            trigger: ['input', 'blur']
+          },
+      date: {
+            type: 'array',
+            required: true,
+            message: '请选择任务时间',
+            trigger: ['change', 'blur']
+          },
+      state: {
+            required: true,
+            message: '请选择任务状态',
+            trigger: ['change', 'blur']
+          }
+    })
+    const form1 = ref({
       taskId:'',
       userId:'',
       taskWork:'',
     })
-    let form2 = ref({
-      
+    const rules1 = ref({
+      userId: {
+            required: true,
+            message: '请选择员工',
+            trigger: ['change', 'blur']
+          },
+      taskWork: {
+            required: true,
+            message: '请输入任务要求',
+            trigger: ['input', 'blur']
+          },
     })
+    const form2 = ref({
+      taskWork:'',
+      state:''
+    })
+    const rules2 = ref({
+      taskWork: {
+            required: true,
+            message: '请输入任务要求',
+            trigger: ['input', 'blur']
+          },
+      state: {
+            required: true,
+            message: '请选择任务状态',
+            trigger: ['change', 'blur']
+          }
+    })
+    const form3 = ref({
+      userId:localStorage.getItem('USERID'),
+      name: null,
+      state:null
+    })
+    const stateOptions = ref([
+      {
+        value:"完成",
+        label:"完成"
+      },
+      {
+        value:"未完成",
+        label:"未完成"
+      },
+    ])
     const userOptions = ref([])
     const data = ref([])
     const data1 = ref([])
@@ -308,6 +450,15 @@ export default defineComponent({
       getTask()
       getOptions()
     })
+    const query = () => {
+      console.log(form3.value)
+      if(form3.value.name === ''){
+        form3.value.name = null
+      }
+      HTTPGetTaskSelective(form3.value).then(res =>{
+        data.value = res
+      })
+    }
     const getOptions = () => {
       let id = localStorage.getItem("USERID")
       HTTPGetUser(id).then(res =>{
@@ -329,25 +480,36 @@ export default defineComponent({
     }
     //添加
     //修改
-    const addTask = () => {
-      form.value.beginDate = form.value?.date[0]
-        form.value.endDate = form.value.date[1]
-        form.value.userId = localStorage.getItem('USERID')
-      if( !actionType.value ) {
-        console.log(form.value)
-        HTTPAddTask(form.value).then(res =>{
-          if(res.code === 200){
-            getTask()
+    const addTask = (e) => {
+      e.preventDefault()
+        formRef.value?.validate((errors) => {
+          if (!errors) {
+            form.value.beginDate = form.value?.date[0]
+            form.value.endDate = form.value.date[1]
+            form.value.userId = localStorage.getItem('USERID')
+            if( !actionType.value ) {
+              console.log(form.value)
+              HTTPAddTask(form.value).then(res =>{
+                if(res.code === 200){
+                  getTask()
+                  message.success(res.message)
+                }else{
+                  message.error(res.message)
+                }
+              })
+            } else {
+              HTTPUpdateTask(form.value).then(res =>{
+                if(res.code === 200){
+                  getTask()
+                  message.success(res.message)
+                }else{
+                  message.error(res.message)
+                }
+              })
+            }
+            active.value = false
           }
         })
-      } else {
-        HTTPUpdateTask(form.value).then(res =>{
-          if(res.code === 200){
-            getTask()
-          }
-        })
-      }
-      active.value = false
     }
     const handleActivate= (type, item) => {
       active.value = true
@@ -368,51 +530,79 @@ export default defineComponent({
     }
     const handleActivate1= (id) => {
       active1.value = true
-      form1.value = {
-        taskId:id,
-        userId:'',
-        taskWork:'',
-      }
+      form1.value.taskId = id
     }
     const handleActivate2= (item) => {
       active3.value = true
       form2.value = item
     }
-    const updateUserTask = () =>{
-      HTTPUpdateUserTask(form2.value).then(res =>{
-        console.log(res)
-        show(form2.value.taskId)
-      })
-      active3.value = false
+    const updateUserTask = (e) =>{
+      e.preventDefault()
+        formRef2.value?.validate((errors) => {
+          if (!errors) {
+             HTTPUpdateUserTask(form2.value).then(res =>{
+              if(res.code === 200){
+                  show(form2.value.taskId)
+                  message.success(res.message)
+                }else{
+                  message.error(res.message)
+                }
+            })
+            active3.value = false
+          }
+        })
     }
     const deleteUser = (item) =>{
       HTTPDeleteTaskUser(item.id).then(res =>{
-        console.log(res)
-        show(item.taskId)
+        if(res.code === 200){
+            show(item.taskId)
+            message.success(res.message)
+          }else{
+            message.error(res.message)
+          }
       })
     }
-    const addUser = () =>{
-      console.log(form1.value)
-      HTTPAddUserTask(form1.value).then(res =>{
-          console.log(res.message)
+    const addUser = (e) =>{
+      e.preventDefault()
+        formRef1.value?.validate((errors) => {
+          if (!errors) {
+            console.log(form1.value)
+            HTTPAddUserTask(form1.value).then(res =>{
+                if(res.code === 200){
+                  show(form1.value.taskId)
+                  message.success(res.message)
+                }else{
+                  message.error(res.message)
+                }
+              })
+            active1.value = false
+          }
         })
-      active1.value = false
     }
     const show = (id) =>{
       HTTPGetTaskUser(id).then(res =>{
         data1.value = res
+        active2.value = true
       })
-      active2.value = true
     }
     return {
+      formRef,
+      formRef1,
+      formRef2,
+      rules,
+      rules1,
+      rules2,
       form,
       form1,
       form2,
+      form3,
+      stateOptions,
       actionType,
       userOptions,
       addTask,
       addUser,
       updateUserTask,
+      query,
       active,
       active1,
       active2,

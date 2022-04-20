@@ -58,11 +58,10 @@ import { LabelLayout } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
 
 import { h, defineComponent, ref, onMounted, getCurrentInstance } from 'vue'
-import { useNotification, NotificationType } from 'naive-ui'
+import { useNotification, NotificationType,useMessage } from 'naive-ui'
 import {HTTPAddSignIn,HTTPGetUserTask} from './HttpMethods'
 interface data {
-  userId: string,
-  name: string,
+  userId: string
 }
 export default defineComponent({
   
@@ -85,6 +84,7 @@ export default defineComponent({
       })
       
     })
+    
     const init = ()=>{
       var chartDom = document.getElementById('main')!;
       var myChart = echarts.init(chartDom);
@@ -128,6 +128,7 @@ export default defineComponent({
       };
       option && myChart.setOption(option);
     }
+    const message = useMessage()
     const notification = useNotification()
     const notice = (string: NotificationType, context:string) => {
       notification[string]({
@@ -150,14 +151,15 @@ export default defineComponent({
     }
     const signIn = () => {
         const data:data ={
-            userId : localStorage.getItem("USERID") || '',
-            name : localStorage.getItem("USERNAME") || ''
+            userId : localStorage.getItem("USERID") || ''
         }
         HTTPAddSignIn(data)?.then((res:any) =>{
           if(res.code === 200){
-              notice('success', res.message)
+            message.success(res.message)
+            //notice('success', res.message)
           } else {
-              notice('error', res.message)
+            message.error(res.message)
+              //notice('error', res.message)
           }
         })
     }

@@ -27,11 +27,17 @@ function publicMethod(path:string, type:string, data?:any) {
 export function HTTPGetRecordAward(id:string) {
     return  publicMethod(`/api/jiangcheng/query/${id}`, 'get') 
 }
+export function HTTPGetRecordAwardSelective(data:any) {
+    return  publicMethod('/api/jiangcheng/querySelective', 'post',data) 
+}
 export function HTTPAddRecordAward(data:any) {
     return publicMethod('/api/jiangcheng/add', 'post', data)
 }
 export function HTTPGetInstitution() {
     return  publicMethod('/api/jiangchengSystem/queryAll', 'get') 
+}
+export function HTTPGetInstitutionSelective(data:any) {
+    return  publicMethod('/api/jiangchengSystem/querySelective', 'post',data) 
 }
 export function HTTPAddInstitution(data:any) {
     return publicMethod('/api/jiangchengSystem/add', 'post', data)
@@ -45,8 +51,14 @@ export function HTTPGetUser(id:string) {
 export function HTTPGetAwardApprove() {
     return  publicMethod('/api/jiangcheng/queryUnapproved', 'get') 
 }
+export function HTTPGetAwardApprovSelective(data:any) {
+    return  publicMethod('/api/jiangcheng/queryUnapprovedSelective', 'post',data) 
+}
 export function HTTPUpdataAwardApprove(id:number) {
     return publicMethod(`/api/jiangcheng/update/${id}`,'put')
+}
+export function HTTPGetDepartment() {
+    return  publicMethod('/api/department/queryUseAll', 'get')
 }
 
 

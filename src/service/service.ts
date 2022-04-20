@@ -1,14 +1,29 @@
 import axios from "axios";
 import { AxiosInstance, AxiosRequestConfig } from "axios";
+import router  from '../router'
+import { ElMessage } from "element-plus";
+
+
 
 class CKhttp {
     instance: AxiosInstance
     constructor(config:AxiosRequestConfig) {
         this.instance = axios.create(config)
-        
-        this.instance.interceptors.response.use((res) => {
-            console.log('实例响应')
-            return res.data
+        this.instance.interceptors.request.use((config:any) => {
+            const token  = localStorage.getItem('token')
+            if(token) {
+                config.headers.token = token
+            }
+            return config
+        })
+        this.instance.interceptors.response.use((res:any) => {
+            console.log('实例响应')     
+            if( res.data.code === 401 ) {
+                router.push('/login')
+                ElMessage.error(res.data.message)
+            } else {
+                return res.data
+            }
         },
         (err) => {
             // if( err.response.status = 404) {

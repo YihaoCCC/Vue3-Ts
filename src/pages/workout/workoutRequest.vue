@@ -7,6 +7,23 @@
     }"
     hoverable
   >
+  <template #header>
+    <n-form inline label-placement="left" >
+      <n-form-item label='部门：' v-if="!isAuthPre('TRAVEL_APPROVE:SELECTALL')">
+        <n-select placeholder="请选择部门" v-model:value="form.departmentId" :options="departmentOptions" clearable style="width: 180px">
+        </n-select>
+      </n-form-item>
+      <n-form-item label='员工姓名：' v-if="!isAuthPre('TRAVEL_APPROVE:SELECTALL') || !isAuthPre('TRAVEL_APPROVE:SELECTDEPT')">
+        <n-input placeholder="请输入员工姓名"  v-model:value="form.userName" clearable>
+        </n-input>
+      </n-form-item>
+      <n-form-item>
+      <n-button tertiary type="primary" @click="query">
+        查询
+      </n-button>
+    </n-form-item>
+    </n-form>
+  </template>
     <n-data-table
       :bordered="false"
       :columns="columns"
@@ -20,7 +37,7 @@
 <script>
 //表格数据  GET     /travel/queryUnapproved/{userId}
 //批准  Put    /travel/update/{id}       
-import { h, defineComponent, ref, onMounted } from 'vue'
+import { h, defineComponent, ref, onMounted,getCurrentInstance } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
 
 const createColumns = ({ WorkOutRequest }) => {
@@ -31,11 +48,19 @@ const createColumns = ({ WorkOutRequest }) => {
     },
     {
       title: '员工姓名',
-      key: 'name'
+      key: 'user.name'
+    },
+    {
+      title: '部门',
+      key: 'user.department.name'
     },
     {
       title: '出差原因',
-      key: 'reason'
+      key: 'reason',
+      width: 500,
+      // ellipsis: {
+      //   tooltip: true
+      // }
     },
     {
       title: '开始时间',
@@ -47,31 +72,25 @@ const createColumns = ({ WorkOutRequest }) => {
     },
     {
       title: '审批状态',
-      key: 'state'
+      key: 'state',
+      render(row) {
+          return h(
+            NTag,
+            {
+              round: true,
+              style: {
+                marginRight: '6px',
+              },
+              type: row.state === '批准' ? 'success' : 'error'
+            },
+            {
+              default: () => row.state
+            }
+          )
+      }
     },
-    // {
-    //   title: '审批状态',
-    //   key: 'tags',
-    //   render (row) {
-    //     const tags = row.tags.map((tagKey) => {
-    //       return h(
-    //         NTag,
-    //         {
-    //           style: {
-    //             marginRight: '6px'
-    //           },
-    //           type: 'info'
-    //         },
-    //         {
-    //           default: () => tagKey
-    //         }
-    //       )
-    //     })
-    //     return tags
-    //   }
-    // }
     {
-      title: 'Action',
+      title: '操作',
       key: 'actions',
       render (row) {
         const button = [1].map((item) => {
@@ -79,6 +98,8 @@ const createColumns = ({ WorkOutRequest }) => {
                 return h(
                     NButton,
                     {
+                        type: 'info',
+                        text: true,
                         style: {
                             marginRight: '6px'
                         },
@@ -96,13 +117,41 @@ const createColumns = ({ WorkOutRequest }) => {
   ]
 }
 
-import {HTTPGetWorkOutRequest,HTTPUpdataWorkOutRequest} from './HttpMethods'
+import {HTTPGetWorkOutRequest,HTTPUpdataWorkOutRequest,HTTPGetDepartment,HTTPGetWorkOutRequestSelective} from './HttpMethods'
 export default defineComponent({
   setup () {
+    const message = useMessage()
+    const isAuthPre= getCurrentInstance()?.appContext.config.globalProperties.isAuthPer
     const data = ref([])
+    const form = ref({
+      userId:localStorage.getItem('USERID'),
+      userName: null,
+      departmentId:null
+    })
+    const departmentOptions = ref([])
     onMounted(() => {
       getWorkOutRequest()
+      getOptions()
     })
+    const query = () => {
+      console.log(form.value)
+      if(form.value.userName === ''){
+        form.value.userName = null
+      }
+      HTTPGetWorkOutRequestSelective(form.value).then(res =>{
+        data.value = res
+      })
+    }
+    const getOptions = () => {
+      HTTPGetDepartment().then(res =>{
+        res.forEach(element => {
+          departmentOptions.value.push({
+            value: element.id,
+            label: element.name
+            })
+          });
+      })
+    }
     //表格中的数据
     const getWorkOutRequest = () => {
       let id = localStorage.getItem("USERID")
@@ -115,10 +164,17 @@ export default defineComponent({
       HTTPUpdataWorkOutRequest(id).then(res =>{
           if(res.code === 200){
             getWorkOutRequest()
+            message.success(res.message)
+          }else{
+            message.error(res.message)
           }
         })
     }
     return {
+      isAuthPre,
+      form,
+      query,
+      departmentOptions,
       data,
       columns: createColumns({
         WorkOutRequest

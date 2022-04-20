@@ -27,14 +27,23 @@ function publicMethod(path:string, type:string, data?:any) {
 export function HTTPGetWorkOut(id:string) {
     return  publicMethod(`/api/travel/query/${id}`, 'get') 
 }
+export function HTTPGetWorkOutSelective(data:any) {
+    return  publicMethod('/api/travel/querySelective', 'post',data) 
+}
 export function HTTPAddWorkOut(data:any) {
     return publicMethod('/api/travel/add', 'post', data)
 }
 export function HTTPGetWorkOutRequest(id:string) {
     return  publicMethod(`/api/travel/queryUnapproved/${id}`, 'get') 
 }
+export function HTTPGetWorkOutRequestSelective(data:any) {
+    return  publicMethod('/api/travel/queryUnapprovedSelective', 'post',data) 
+}
 export function HTTPUpdataWorkOutRequest(id:number) {
     return publicMethod(`/api/travel/update/${id}`,'put')
+}
+export function HTTPGetDepartment() {
+    return  publicMethod('/api/department/queryUseAll', 'get')
 }
 
 

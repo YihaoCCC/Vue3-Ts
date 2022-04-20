@@ -7,8 +7,25 @@
       }"
       hoverable
   >
+  <template #header>
+    <n-form inline label-placement="left" >
+      <n-form-item label='部门：' v-if="!isAuthPre('USER:SELECTALL')">
+        <n-select placeholder="请选择部门" v-model:value="form1.departmentId" :options="departmentOptions" clearable style="width: 180px">
+        </n-select>
+      </n-form-item>
+      <n-form-item label='员工姓名：' >
+        <n-input placeholder="请输入员工姓名"  v-model:value="form1.name" clearable>
+        </n-input>
+      </n-form-item>
+      <n-form-item>
+      <n-button tertiary type="primary" @click="query">
+        查询
+      </n-button>
+    </n-form-item>
+    </n-form>
+  </template>
     <template #header-extra>
-      <n-button tertiary type="primary" @click="handleActivate(0)" :disabled="isAuthPre('USER:INSERT')">
+      <n-button tertiary type="primary" @click="handleActivate(0)"  v-if="!isAuthPre('USER:INSERT')">
           添加员工
       </n-button>
     </template>
@@ -23,21 +40,18 @@
         <template #header>
           员工信息
         </template>
-        <n-form>
-          <n-form-item label='用户姓名' >
-            <n-input placeholder="用户姓名"  v-model:value="form.name" >
-
+        <n-form ref="formRef" :model="form" :rules="rules" >
+          <n-form-item label='员工姓名：' path="name">
+            <n-input placeholder="员工姓名"  v-model:value="form.name" >
             </n-input>
           </n-form-item>
-          <n-form-item label='用户性别'>
+          <n-form-item label='员工性别：' path="sex">
             <n-radio-group v-model:value="form.sex" name="radiogroup">
               <n-radio value="男">男 </n-radio>
               <n-radio value='女'>女</n-radio>
             </n-radio-group>
           </n-form-item>
-          
-        </n-form>
-        <n-form-item label='出生日期' >
+          <n-form-item label='出生日期：' path="birthday">
             <n-date-picker
               size="medium" type="date"
               placeholder="请选择出生日期"
@@ -46,28 +60,29 @@
               clearable
             />
           </n-form-item>
-        <n-form >
-            <n-form-item label='身份证号' >
+          <n-form-item label='身份证号：' path="idNumber">
               <n-input placeholder="请输入身份证号"  v-model:value="form.idNumber">
               </n-input>
             </n-form-item>
-            <n-form-item label='邮箱' >
+          <n-form-item label='邮箱：' path="email">
               <n-input placeholder="请输入邮箱"  v-model:value="form.email">
 
               </n-input>
             </n-form-item>
-        </n-form>
-        <n-form>
-          <n-form-item label='住址' >
-            <n-input placeholder="请输入住址"  v-model:value="form.nativePlace">
+          <n-form-item label='籍贯：' path="nativePlace">
+            <n-input placeholder="请输入籍贯"  v-model:value="form.nativePlace">
             </n-input>
           </n-form-item>
-          <n-form-item label='手机号' >
+          <n-form-item label='住址：' path="address">
+            <n-input placeholder="请输入住址"  v-model:value="form.address">
+            </n-input>
+          </n-form-item>
+          <n-form-item label='手机号：' path="phone">
             <n-input placeholder="请输入手机号" v-model:value="form.phone">
 
             </n-input>
           </n-form-item>
-          <!-- <n-form-item label='入职日期' >
+          <n-form-item label='入职日期：' v-if="actionType" path="beginDate">
             <n-date-picker
               placeholder="请选择入职日期"
               v-model:formatted-value="form.beginDate"
@@ -75,18 +90,15 @@
               type="date"
               clearable
             />
-          </n-form-item> -->
-        </n-form>
-        <n-form> 
-          <n-form-item label='所在部门' >
-            <n-select placeholder="请选择所在部门" v-model:value="form.departmentId" :options="departmentOptions">
-
+          </n-form-item>
+          <n-form-item label='所在部门：' path="departmentId">
+            <n-select placeholder="请选择所在部门" v-model:value="form.departmentId" :options="departmentOptions" clearable>
             </n-select>
           </n-form-item>
-          <n-form-item label='职位' >
+          <n-form-item label='职位：' path="positionId">
             <n-select placeholder="请选择职位"
               multiple
-              v-model:value="positonArray" :options="positionOptions">
+              v-model:value="form.positionId" :options="positionOptions" clearable>
             </n-select>
           </n-form-item>
         </n-form>
@@ -111,51 +123,81 @@ const createColumns = ({ handleActivate, deleteUser,isAuthPre }) => {
   return [
     {
       title: '员工号',
-      key: 'userId'
+      key: 'userId',
+      width: 80
     },
     {
       title: '姓名',
-      key: 'name'
+      key: 'name',
+      width: 80
     },
     {
       title: '性别',
-      key: 'sex'
+      key: 'sex',
+      width: 60
     },
     {
       title: '出生日期',
-      key: 'birthday'
+      key: 'birthday',
+      width: 110
     },
     {
       title: '身份证号',
-      key: 'idNumber'
+      key: 'idNumber',
+      width: 100,
+      ellipsis: {
+        tooltip: true
+      }
     },
     {
       title: '邮箱',
-      key: 'email'
+      key: 'email',
+      width: 100,
+      ellipsis: {
+        tooltip: true
+      }
     },
     {
       title: '籍贯',
-      key: 'nativePlace'
+      key: 'nativePlace',
+      width: 100,
+      ellipsis: {
+        tooltip: true
+      }
     },
     {
       title: '住址',
-      key: 'address'
+      key: 'address',
+      width: 100,
+      ellipsis: {
+        tooltip: true
+      }
     },
     {
       title: '手机号码',
-      key: 'phone'
+      key: 'phone',
+      width: 100,
+      ellipsis: {
+        tooltip: true
+      }
     },
     {
       title: '入职日期',
-      key: 'beginDate'
+      key: 'beginDate',
+      width: 110
     },
     {
       title: '所在部门',
-      key: 'department.name'
+      key: 'department.name',
+      width: 80
     },
     {
       title: '职位',
       key: 'position',
+      // width: 110,
+      // ellipsis: {
+      //   tooltip: true
+      // },
       render(row) {
         const tags = row.position.map((tagKey) => {
           return h(
@@ -175,7 +217,7 @@ const createColumns = ({ handleActivate, deleteUser,isAuthPre }) => {
       }
     },
     {
-      title: 'Action',
+      title: '操作',
       key: 'actions',
       render (row) {
         const button = [1,2].map((item) => {
@@ -183,6 +225,8 @@ const createColumns = ({ handleActivate, deleteUser,isAuthPre }) => {
                 return h(
                     NButton,
                     {
+                        type: 'info',
+                        text: true,
                         style: {
                             marginRight: '6px'
                         },
@@ -198,7 +242,7 @@ const createColumns = ({ handleActivate, deleteUser,isAuthPre }) => {
                             NButton,
                             {
                                 type: 'error',
-                                dashed: true,    
+                                text: true,    
                                 style: {
                                     marginRight: '6px',
                                 },
@@ -208,7 +252,7 @@ const createColumns = ({ handleActivate, deleteUser,isAuthPre }) => {
                                 onClick: () => deleteUser(row.userId)
                             },
                             
-                            { default: () => '删除' }
+                            { default: () => '离职' }
                         )
                 }
         })
@@ -219,9 +263,11 @@ const createColumns = ({ handleActivate, deleteUser,isAuthPre }) => {
 }
 
 
-import  { HTTPGetUser, HTTPAddUser, HTTPUpdataUser , HTTPDeleteUser, HTTPGetDepartment, HTTPGetPosition }from './HttpUser'
+import  { HTTPGetUser, HTTPAddUser, HTTPUpdataUser , HTTPDeleteUser, HTTPGetDepartment, HTTPGetPosition,HTTPGetUserSelective }from './HttpUser'
 export default defineComponent({
   setup () {
+    const formRef = ref(null)
+    const message = useMessage()
     const isAuthPre= getCurrentInstance()?.appContext.config.globalProperties.isAuthPer
     const active = ref(false)
     const actionType = ref(0) // 0增加 1修改
@@ -239,7 +285,71 @@ export default defineComponent({
         phone:null,
         beginDate: null,
         departmentId:null,
-        positionId:null
+        positionId:[]
+    })
+    const form1 = ref({
+      userId:localStorage.getItem('USERID'),
+      name: null,
+      departmentId:null,
+    })
+    const rules = ref({
+      name: {
+            required: true,
+            message: '请输入员工姓名',
+            trigger: 'blur'
+          },
+      sex: {
+            required: true,
+            message: '请选择员工性别',
+            trigger: ['change', 'blur']
+          },
+      birthday: {
+            required: true,
+            message: '请选择出生日期',
+            trigger: ['change', 'blur']
+          },
+      idNumber: {
+            required: true,
+            message: '请输入身份证号',
+            trigger: ['input', 'blur']
+          },
+      email: {
+            required: true,
+            message: '请输入邮箱',
+            trigger: ['input', 'blur']
+          },
+      nativePlace: {
+            required: true,
+            message: '请输入籍贯',
+            trigger: ['input', 'blur']
+          },
+      address: {
+            required: true,
+            message: '请输入住址',
+            trigger: ['input', 'blur']
+          },
+      phone: {
+            required: true,
+            message: '请输入手机号',
+            trigger: ['input', 'blur']
+          },
+      beginDate: {
+            required: true,
+            message: '请选择入职日期',
+            trigger: ['change', 'blur']
+          },
+      departmentId: {
+            type: 'number',
+            required: true,
+            message: '请选择所在部门',
+            trigger: ['change', 'blur']
+          },
+      positionId: {
+            type: 'array',
+            required: true,
+            message: '请选择职位',
+            trigger: ['change', 'blur']
+          }
     })
     const positonArray = ref([])
     onMounted(() => {
@@ -264,41 +374,69 @@ export default defineComponent({
           });
       })
     }
+    const query = () => {
+      console.log(form1.value)
+      if(form1.value.name === ''){
+        form1.value.name = null
+      }
+      HTTPGetUserSelective(form1.value).then(res =>{
+        data.value = res
+      })
+    }
     const getUser = () => {
         let id = localStorage.getItem("USERID")
         HTTPGetUser(id).then(res => {
           data.value = res
         })
     }
-    const addOrUpdataUser = () => {
-      form.value.positionId = positonArray.value 
+    const addOrUpdataUser = (e) => {
+      e.preventDefault()
       console.log(form.value)
-      if( !actionType.value ) {
-        HTTPAddUser(form.value).then(res =>{
-          if(res.code === 200){
-            getUser()
+      formRef.value?.validate((errors) => {
+          if (!errors) {
+            if( !actionType.value ) {
+              HTTPAddUser(form.value).then(res =>{
+                if(res.code === 200){
+                  getUser()
+                  message.success(res.message)
+                }else{
+                  message.error(res.message)
+                }
+              })
+            } else {
+              HTTPUpdataUser(form.value).then(res =>{
+                if(res.code === 200){
+                  getUser()
+                  message.success(res.message)
+                }else{
+                  message.error(res.message)
+                }
+              })
+            }
+            active.value = false
           }
         })
-      } else {
-        HTTPUpdataUser(form.value).then(res =>{
-          if(res.code === 200){
-            getUser()
-          }
-        })
-      }
-      active.value = false
     }
     const deleteUser = (id) => {
-      HTTPDeleteUser(id)
+      HTTPDeleteUser(id).then(res =>{
+        if(res.code === 200){
+            getUser()
+            message.success(res.message)
+          }else{
+            message.error(res.message)
+          }
+      })
     }
     const handleActivate= (type, item) => {
       active.value = true
       positonArray.value = []
       if( type ) {
         form.value = item
+        console.log(form.value)
         form.value?.position.forEach((item) => {
           positonArray.value.push(item.id)
         })
+        form.value.positionId = positonArray.value
         actionType.value = 1
       } else {
         form.value = {
@@ -312,19 +450,23 @@ export default defineComponent({
             phone: '',
             beginDate: null,
             departmentId:null,
-            positionId:null
+            positionId:[]
         }
         actionType.value = 0
       } 
     }
     return {
+      formRef,
+      rules,
       isAuthPre,
       active,
       actionType,
       form,
+      form1,
       positonArray,
       departmentOptions,
       positionOptions,
+      query,
       handleActivate,
       addOrUpdataUser,
       deleteUser,

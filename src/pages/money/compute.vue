@@ -1,11 +1,29 @@
 <template>
-<n-card hoverable>
+  <n-card hoverable>
     <n-data-table
       :bordered="false"
       :columns="columns"
       :data="data"
       :pagination="pagination"
     />
+    <br/>
+    <br/>
+    <n-card
+    v-if="active"
+    title="薪资记录"
+    :segmented="{
+      content: true,
+      footer: 'soft'
+    }"
+    hoverable
+    >
+      <n-data-table
+        :bordered="false"
+        :columns="columns1"
+        :data="data1"
+        :pagination="pagination"
+      />
+    </n-card>
   </n-card>
   
 </template>
@@ -39,14 +57,15 @@ const createColumns = ({ compute }) => {
                 return h(
                     NButton,
                     {
+                        type: 'info',
+                        text: true,
                         style: {
                             marginRight: '6px'
                         },
                         size: 'small',
                         onClick: () => compute(row.id)
                     },
-                    
-                    { default: () => '计算薪资' }
+                    { default: () => '计算上个月薪资' }
                 )
             }
         })
@@ -55,11 +74,62 @@ const createColumns = ({ compute }) => {
     }
   ]
 }
+const createColumns1 = () => {
+  return [
+    {
+      title: '员工号',
+      key: 'userId'
+    },
+    {
+      title: '员工姓名',
+      key: 'user.name'
+    },
+    {
+      title: '部门',
+      key: 'user.department.name'
+    },
+    {
+      title: '薪资日期（年）',
+      key: 'year'
+    },
+    {
+      title: '薪资日期（月）',
+      key: 'month'
+    },
+    {
+      title: '基本薪资',
+      key: 'work'
+    },
+    {
+      title: '迟到扣除',
+      key: 'late'
+    },
+    {
+      title: '旷工扣除',
+      key: 'notWork'
+    },
+    {
+      title: '出差补贴薪资',
+      key: 'travel'
+    },
+    {
+      title: '奖惩薪资',
+      key: 'jiangcheng'
+    },
+    {
+      title: '具体薪资',
+      key: 'money'
+    }
+  ]
+}
 
-import {HTTPGetDepartment,HTTPGetCompute} from './HttpMethods'
+import {HTTPGetDepartment,HTTPGetCompute,HTTPGetMoneyRecordLastMonth} from './HttpMethods'
 export default defineComponent({
   setup () {
+    const message = useMessage()
+    const active = ref(false)
     const data = ref([])
+    const data1 = ref([])
     onMounted(() => {
       getDepartment()
     })
@@ -73,14 +143,25 @@ export default defineComponent({
     const compute = (id) => {
       HTTPGetCompute(id).then(res =>{
           if(res.code === 200){
-            console.log(1)
+            message.success(res.message)
+          }else{
+            message.error(res.message)
           }
+          HTTPGetMoneyRecordLastMonth(id).then(res =>{
+            data1.value = res
+            active.value = true
+          })
+          
         })
     }
     return {
       data,
+      data1,
+      active,
       columns: createColumns({
         compute
+      }),
+      columns1: createColumns1({
       }),
       pagination: {
         pageSize: 10
