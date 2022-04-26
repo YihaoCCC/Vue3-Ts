@@ -9,11 +9,11 @@
   >
   <template #header>
     <n-form inline label-placement="left" >
-      <n-form-item label='部门：' v-if="!isAuthPre('TRAVEL_RECORD:SELECTALL')">
+      <n-form-item label='部门:' v-if="!isAuthPre('TRAVEL_RECORD:SELECTALL')">
         <n-select placeholder="请选择部门" v-model:value="form1.departmentId" :options="departmentOptions" clearable style="width: 180px">
         </n-select>
       </n-form-item>
-      <n-form-item label='员工姓名：' v-if="!isAuthPre('TRAVEL_RECORD:SELECTALL') || !isAuthPre('TRAVEL_RECORD:SELECTDEPT')">
+      <n-form-item label='员工姓名:' v-if="!isAuthPre('TRAVEL_RECORD:SELECTALL') || !isAuthPre('TRAVEL_RECORD:SELECTDEPT')">
         <n-input placeholder="请输入员工姓名"  v-model:value="form1.userName" clearable>
         </n-input>
       </n-form-item>
@@ -44,17 +44,18 @@
         <template #header>
           出差记录信息
         </template>
-        <n-form ref="formRef" :model="form" :rules="rules"> 
-          <n-form-item label='出差时间' path="date">
+        <n-form ref="formRef" :model="form" :rules="rules"
+        label-placement="left" label-width="auto" require-mark-placement="right-hanging"> 
+          <n-form-item label='出差时间:' path="date">
             <n-date-picker v-model:formatted-value="form.date" value-format="yyyy-MM-dd" type="daterange" clearable />
           </n-form-item>
-          <n-form-item label='出差原因' path="reason">
+          <n-form-item label='出差原因:' path="reason">
              <n-input placeholder="请输入出差原因" type='textarea'  v-model:value="form.reason" clearable>
 
             </n-input>
           </n-form-item>
         </n-form>
-        <n-button @click="addWorkOut" type="primary">
+        <n-button @click="addWorkOut" type="primary" tertiary>
           添加
         </n-button>
       </n-drawer-content>

@@ -24,14 +24,12 @@ function publicMethod(path:string, type:string, data?:any) {
     }
     return result
 }
-
-export function HTTPGetUser() {
-    return  publicMethod('/api/user/info', 'get')
+export function HTTPGetDepartment() {
+    return  publicMethod('/api/department/queryUseAll', 'get')
 }
-export function HTTPAddSignIn(data:any) {
-    return publicMethod('/api/signIn/add', 'post', data)
+export function HTTPGetDeptAward(data:any) {
+    return  publicMethod('/api/jiangcheng/queryDept', 'post',data)
 }
-
-export function HTTPGetUserTask(id:string) {
-    return  publicMethod(`/api/userTask/queryNoFinishByUserId/${id}`, 'get') 
+export function HTTPGetUserSign(data:any) {
+    return  publicMethod('/api/signIn/querySign', 'post',data)
 }

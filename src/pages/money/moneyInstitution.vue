@@ -21,20 +21,22 @@
     <n-drawer v-model:show="active" :width="502">
       <n-drawer-content>
         <template #header>
-          部门信息
+          薪资制度
         </template>
-        <n-form ref="formRef" :model="form" :rules="rules">
-          <n-form-item label='职位' path="positionId">
-            <n-select placeholder="请选择职位" v-model:value="form.positionId" :options="positionOptions" :disabled="actionType === 1 ? true:false" clearable>
+        <n-form ref="formRef" :model="form" :rules="rules"
+        label-placement="left" label-width="auto" require-mark-placement="right-hanging">
+          <n-form-item label='职位:' path="positionId">
+            <p v-if="actionType">{{form.position.name}}</p>
+            <n-select v-else placeholder="请选择职位" v-model:value="form.positionId" :options="positionOptions"  clearable>
             </n-select>
           </n-form-item>
-          <n-form-item label='每天薪资' path="money">
+          <n-form-item label='每天薪资:' path="money">
             <n-input-number placeholder="请输入每天薪资" v-model:value="form.money" clearable>
               <template #prefix>￥</template>
             </n-input-number>
           </n-form-item>
         </n-form>
-        <n-button @click="addMoneyInstitution" type="primary">
+        <n-button @click="addMoneyInstitution" type="primary" tertiary>
           {{!actionType ? '添加' : '修改'}}
         </n-button>
       </n-drawer-content>

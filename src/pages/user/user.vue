@@ -9,11 +9,11 @@
   >
   <template #header>
     <n-form inline label-placement="left" >
-      <n-form-item label='部门：' v-if="!isAuthPre('USER:SELECTALL')">
+      <n-form-item label='部门:' v-if="!isAuthPre('USER:SELECTALL')">
         <n-select placeholder="请选择部门" v-model:value="form1.departmentId" :options="departmentOptions" clearable style="width: 180px">
         </n-select>
       </n-form-item>
-      <n-form-item label='员工姓名：' >
+      <n-form-item label='员工姓名:' >
         <n-input placeholder="请输入员工姓名"  v-model:value="form1.name" clearable>
         </n-input>
       </n-form-item>
@@ -40,18 +40,19 @@
         <template #header>
           员工信息
         </template>
-        <n-form ref="formRef" :model="form" :rules="rules" >
-          <n-form-item label='员工姓名：' path="name">
+        <n-form ref="formRef" :model="form" :rules="rules" 
+        label-placement="left" label-width="auto" require-mark-placement="right-hanging">
+          <n-form-item label='员工姓名:' path="name">
             <n-input placeholder="员工姓名"  v-model:value="form.name" >
             </n-input>
           </n-form-item>
-          <n-form-item label='员工性别：' path="sex">
+          <n-form-item label='员工性别:' path="sex">
             <n-radio-group v-model:value="form.sex" name="radiogroup">
               <n-radio value="男">男 </n-radio>
               <n-radio value='女'>女</n-radio>
             </n-radio-group>
           </n-form-item>
-          <n-form-item label='出生日期：' path="birthday">
+          <n-form-item label='出生日期:' path="birthday">
             <n-date-picker
               size="medium" type="date"
               placeholder="请选择出生日期"
@@ -60,29 +61,29 @@
               clearable
             />
           </n-form-item>
-          <n-form-item label='身份证号：' path="idNumber">
+          <n-form-item label='身份证号:' path="idNumber">
               <n-input placeholder="请输入身份证号"  v-model:value="form.idNumber">
               </n-input>
             </n-form-item>
-          <n-form-item label='邮箱：' path="email">
+          <n-form-item label='邮箱:' path="email">
               <n-input placeholder="请输入邮箱"  v-model:value="form.email">
 
               </n-input>
             </n-form-item>
-          <n-form-item label='籍贯：' path="nativePlace">
+          <n-form-item label='籍贯:' path="nativePlace">
             <n-input placeholder="请输入籍贯"  v-model:value="form.nativePlace">
             </n-input>
           </n-form-item>
-          <n-form-item label='住址：' path="address">
+          <n-form-item label='住址:' path="address">
             <n-input placeholder="请输入住址"  v-model:value="form.address">
             </n-input>
           </n-form-item>
-          <n-form-item label='手机号：' path="phone">
+          <n-form-item label='手机号:' path="phone">
             <n-input placeholder="请输入手机号" v-model:value="form.phone">
 
             </n-input>
           </n-form-item>
-          <n-form-item label='入职日期：' v-if="actionType" path="beginDate">
+          <n-form-item label='入职日期:' v-if="actionType" path="beginDate">
             <n-date-picker
               placeholder="请选择入职日期"
               v-model:formatted-value="form.beginDate"
@@ -91,18 +92,18 @@
               clearable
             />
           </n-form-item>
-          <n-form-item label='所在部门：' path="departmentId">
+          <n-form-item label='所在部门:' path="departmentId">
             <n-select placeholder="请选择所在部门" v-model:value="form.departmentId" :options="departmentOptions" clearable>
             </n-select>
           </n-form-item>
-          <n-form-item label='职位：' path="positionId">
+          <n-form-item label='职位:' path="positionId">
             <n-select placeholder="请选择职位"
               multiple
               v-model:value="form.positionId" :options="positionOptions" clearable>
             </n-select>
           </n-form-item>
         </n-form>
-        <n-button @click="addOrUpdataUser" type="primary">
+        <n-button @click="addOrUpdataUser" type="primary" tertiary>
           {{!actionType ? '添加' : '修改'}}
         </n-button>
       </n-drawer-content>

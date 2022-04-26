@@ -9,18 +9,18 @@
   >
   <template #header>
     <n-form inline label-placement="left" >
-      <n-form-item label='部门：' v-if="!isAuthPre('SALARY_RECORD:SELECTALL')">
+      <n-form-item label='部门:' v-if="!isAuthPre('SALARY_RECORD:SELECTALL')">
         <n-select placeholder="请选择部门" v-model:value="form.departmentId" :options="departmentOptions" clearable style="width: 135px">
         </n-select>
       </n-form-item>
-      <n-form-item label='员工姓名：' v-if="!isAuthPre('SALARY_RECORD:SELECTALL') || !isAuthPre('SALARY_RECORD:SELECTDEPT')">
+      <n-form-item label='员工姓名:' v-if="!isAuthPre('SALARY_RECORD:SELECTALL') || !isAuthPre('SALARY_RECORD:SELECTDEPT')">
         <n-input placeholder="请输入员工姓名"  v-model:value="form.userName" clearable style="width: 140px">
         </n-input>
       </n-form-item>
-      <n-form-item label='年份：'>
+      <n-form-item label='年份:'>
         <n-date-picker placeholder="请选择年份" value-format="yyyy" v-model:formatted-value="form.year" type="year" clearable style="width: 135px"/>
       </n-form-item>
-      <n-form-item label='月份：'>
+      <n-form-item label='月份:'>
         <n-date-picker placeholder="请选择月份" value-format="yyyy-MM" v-model:formatted-value="form.month" type="month" clearable style="width: 135px"/>
       </n-form-item>
       <n-form-item>

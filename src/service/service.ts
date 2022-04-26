@@ -19,6 +19,7 @@ class CKhttp {
         this.instance.interceptors.response.use((res:any) => {
             console.log('实例响应')     
             if( res.data.code === 401 ) {
+                localStorage.clear()
                 router.push('/login')
                 ElMessage.error(res.data.message)
             } else {

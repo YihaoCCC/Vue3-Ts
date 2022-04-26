@@ -40,25 +40,26 @@
         <template #header>
           部门信息
         </template>
-        <n-form ref="formRef" :model="form" :rules="rules">
-          <n-form-item label='奖惩制度名字：' path="name">
+        <n-form ref="formRef" :model="form" :rules="rules"
+        label-placement="left" label-width="auto" require-mark-placement="right-hanging">
+          <n-form-item label='奖惩制度名字:' path="name">
             <n-input placeholder="请输入奖惩制度名字"  v-model:value="form.name" >
 
             </n-input>
           </n-form-item>
-          <n-form-item label='奖惩类型：' path="type">
+          <n-form-item label='奖惩类型:' path="type">
             <n-radio-group v-model:value="form.type" name="radiogroup">
               <n-radio value="奖励">奖励</n-radio>
               <n-radio value='惩罚'>惩罚</n-radio>
             </n-radio-group>
           </n-form-item>
-          <n-form-item label='奖惩金额：' path="money">
+          <n-form-item label='奖惩金额:' path="money">
             <n-input-number placeholder="请输入奖惩金额" v-model:value="form.money">
                 <template #prefix>￥</template>
             </n-input-number>
           </n-form-item>
         </n-form>
-        <n-button @click="addInstitution" type="primary">
+        <n-button @click="addInstitution" type="primary" tertiary>
           {{!actionType ? '添加' : '修改'}}
         </n-button>
       </n-drawer-content>

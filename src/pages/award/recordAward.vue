@@ -54,17 +54,18 @@
         <template #header>
           奖惩记录信息
         </template>
-        <n-form ref="formRef" :model="form" :rules="rules"> 
-          <n-form-item label='员工姓名：' path="userId">
+        <n-form ref="formRef" :model="form" :rules="rules"
+        label-placement="left" label-width="auto" require-mark-placement="right-hanging"> 
+          <n-form-item label='员工姓名:' path="userId">
             <n-select placeholder="请选择员工" v-model:value="form.userId" :options="userOptions" clearable>
             </n-select>
           </n-form-item>
-          <n-form-item label='奖惩名：' path="jiangchengId">
+          <n-form-item label='奖惩名:' path="jiangchengId">
             <n-select placeholder="请选择奖惩名" v-model:value="form.jiangchengId" :options="institutionOptions" clearable>
             </n-select>
           </n-form-item>
         </n-form>
-        <n-button @click="addRecordAward" type="primary">
+        <n-button @click="addRecordAward" type="primary" tertiary>
           添加
         </n-button>
       </n-drawer-content>

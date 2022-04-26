@@ -9,7 +9,7 @@
   >
   <template #header>
     <n-form inline label-placement="left" >
-      <n-form-item label='任务名字：'>
+      <n-form-item label='任务名字:'>
         <n-input placeholder="请输入任务名字"  v-model:value="form1.name" clearable style="width: 145px">
         </n-input>
       </n-form-item>
@@ -35,29 +35,29 @@
         <template #header>
           任务信息
         </template>
-        <n-form label-placement="left" ref="formRef" :model="form" :rules="rules"
-        label-width="auto" require-mark-placement="right-hanging">
-          <n-form-item label='任务名字：' >
+        <n-form ref="formRef" :model="form" :rules="rules"
+        label-placement="left" label-width="auto" require-mark-placement="right-hanging">
+          <n-form-item label='任务名字:' >
             {{form.task.name}}
           </n-form-item>
-          <n-form-item label='任务内容：' >
+          <n-form-item label='任务内容:' >
             {{form.task.content}}
           </n-form-item>
-          <n-form-item label='任务要求：' >
+          <n-form-item label='任务要求:' >
             {{form.taskWork}}
           </n-form-item>
-          <n-form-item label='提交内容：' path="content">
+          <n-form-item label='提交内容:' path="content">
             <n-input placeholder="请输入提交内容" type='textarea' v-model:value="form.content" >
             </n-input>
           </n-form-item>
-          <n-form-item label='任务意见：' >
+          <n-form-item label='任务意见:' >
             {{form.view}}
           </n-form-item>
-          <n-form-item label='任务状态：' >
+          <n-form-item label='任务状态:' >
             {{form.state}}
           </n-form-item>
         </n-form>
-        <n-button @click="submit" type="primary">
+        <n-button @click="submit" type="primary" tertiary>
           提交
         </n-button>
       </n-drawer-content>
@@ -105,11 +105,13 @@ const createColumns = ({ handleActivate }) => {
     },
     {
       title: '开始时间',
-      key: 'task.beginDate'
+      key: 'task.beginDate',
+      width: 105,
     },
     {
       title: '结束时间',
-      key: 'task.endDate'
+      key: 'task.endDate',
+      width: 105,
     },
     {
       title: '提交的内容',

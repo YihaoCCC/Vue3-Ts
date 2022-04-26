@@ -76,18 +76,18 @@ export default defineComponent ({
                             res.obj.user.position.map((item:any) => {
                                 positionname.push(item.name)
                             })
-                            localStorage.setItem('POSITION', positionname)
+                            localStorage.setItem('POSITION', JSON.stringify(positionname))
                             
                             let permission:any = []
                             res.obj.user.permission.forEach( (element:any) => {
                             permission.push( element.code )
                             });
-                            localStorage.setItem('permission', permission)
+                            localStorage.setItem('permission', JSON.stringify(permission))
                             let menu:any = []
                             res.obj.user.menu.forEach( (element:any) => {
                             menu.push( element.code )
                             });
-                            localStorage.setItem('MENU', menu)
+                            localStorage.setItem('MENU', JSON.stringify(menu))
                             router.push('/home');
 
                         }else{

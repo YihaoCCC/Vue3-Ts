@@ -9,11 +9,11 @@
   >
   <template #header>
     <n-form inline label-placement="left" >
-      <n-form-item label='部门：' v-if="!isAuthPre('TRAVEL_APPROVE:SELECTALL')">
+      <n-form-item label='部门:' v-if="!isAuthPre('TRAVEL_APPROVE:SELECTALL')">
         <n-select placeholder="请选择部门" v-model:value="form.departmentId" :options="departmentOptions" clearable style="width: 180px">
         </n-select>
       </n-form-item>
-      <n-form-item label='员工姓名：' v-if="!isAuthPre('TRAVEL_APPROVE:SELECTALL') || !isAuthPre('TRAVEL_APPROVE:SELECTDEPT')">
+      <n-form-item label='员工姓名:' v-if="!isAuthPre('TRAVEL_APPROVE:SELECTALL') || !isAuthPre('TRAVEL_APPROVE:SELECTDEPT')">
         <n-input placeholder="请输入员工姓名"  v-model:value="form.userName" clearable>
         </n-input>
       </n-form-item>

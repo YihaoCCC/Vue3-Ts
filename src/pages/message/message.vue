@@ -23,14 +23,15 @@
         <template #header>
           公告信息
         </template>
-        <n-form ref="formRef" :model="form" :rules="rules">
-          <n-form-item label='公告内容' path="content">
+        <n-form ref="formRef" :model="form" :rules="rules"
+        label-placement="left" label-width="auto" require-mark-placement="right-hanging">
+          <n-form-item label='公告内容:' path="content">
             <n-input placeholder="请输入公告内容" type='textarea' v-model:value="form.content">
 
             </n-input>
           </n-form-item>
         </n-form>
-        <n-button @click="addMessage" type="primary">
+        <n-button @click="addMessage" type="primary" tertiary>
           添加
         </n-button>
       </n-drawer-content>

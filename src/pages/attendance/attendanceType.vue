@@ -11,19 +11,20 @@
             <template #header>
               考勤类型制度信息
             </template>
-            <n-form ref="formRef" :model="form" :rules="rules">
-              <n-form-item label='考勤类型制度名称：' path="name">
+            <n-form ref="formRef" :model="form" :rules="rules"
+            label-placement="left" label-width="auto" require-mark-placement="right-hanging">
+              <n-form-item label='考勤类型制度名称:' path="name">
                 {{form.name}}
                 <!-- <n-input  v-model:value="form.name" disabled>
                 </n-input> -->
               </n-form-item>
-              <n-form-item label='奖罚金额：' path="money">
+              <n-form-item label='奖罚金额:' path="money">
                 <n-input-number placeholder="请输入奖罚金额" v-model:value="form.money" clearable>
                   <template #prefix>￥</template>
                 </n-input-number>
               </n-form-item>
             </n-form>
-            <n-button @click="update" type="primary">
+            <n-button @click="update" type="primary" tertiary>
               修改
             </n-button>
           </n-drawer-content>

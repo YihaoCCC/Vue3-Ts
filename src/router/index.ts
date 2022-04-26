@@ -5,7 +5,7 @@ import type { RouteRecordRaw } from 'vue-router'
 const routes: RouteRecordRaw[]= [
     {
         path: '/',
-        redirect: '/home',
+        redirect: '/login',
         component: () => import('../pages/dashboard/dashboard.vue'),
         children: [
             {
@@ -116,8 +116,12 @@ const routes: RouteRecordRaw[]= [
                 path: '/workoutRequest',
                 name: 'workoutRequest',
                 component: () => import('../pages/workout/workoutRequest.vue')  
-
-            }
+            },
+            {
+                path: '/stats',
+                name: 'stats',
+                component: () => import('../pages/stats/stats.vue')
+            },
         ]
     },
     {
@@ -138,20 +142,68 @@ const router:Router = createRouter({
     history: createWebHashHistory()
 })
 
+
+
 router.beforeEach((to,from,next) => {
-    console.log(to.name);
+    const token = localStorage.getItem('token')
+    const menu = JSON.parse(localStorage.getItem('MENU') || "[]")
     if(to.name !== 'login') {
-        const token = localStorage.getItem('token')
         if(token) {
-            next()
-            //console.log(to.name);
+            if(to.name === 'home'){
+                next()
+            }else if(to.name === 'department' && menu.indexOf("DEPARTMENT") != -1){
+                next()
+            }else if(to.name === 'position' && menu.indexOf("POSITION") != -1){
+                next()
+            }else if(to.name === 'user' && menu.indexOf("USER") != -1){
+                next()
+            }else if(to.name === 'recordAward' && menu.indexOf("JIANGCHENG_RECORD") != -1){
+                next()
+            }else if(to.name === 'awardApprove' && menu.indexOf("JIANGCHENG_APPROVE") != -1){
+                next()
+            }else if(to.name === 'institution' && menu.indexOf("JIANGCHENG_SYSTEM") != -1){
+                next()
+            }else if(to.name === 'leave' && menu.indexOf("LEAVE_RECORD") != -1){
+                next()
+            }else if(to.name === 'leaveRequest' && menu.indexOf("LEAVE_APPROVE") != -1){
+                next()
+            }else if(to.name === 'workout' && menu.indexOf("TRAVEL_RECORD") != -1){
+                next()
+            }else if(to.name === 'workoutRequest' && menu.indexOf("TRAVEL_APPROVE") != -1){
+                next()
+            }else if(to.name === 'message' && menu.indexOf("MESSAGE") != -1){
+                next()
+            }else if(to.name === 'moneyRecord' && menu.indexOf("SALARY_RECORD") != -1){
+                next()
+            }else if(to.name === 'moneyInstitution' && menu.indexOf("SALARY_SYSTEM") != -1){
+                next()
+            }else if(to.name === 'compute' && menu.indexOf("SALARY_COMPUTE") != -1){
+                next()
+            }else if(to.name === 'signRecord' && menu.indexOf("SIGN_RECORD") != -1){
+                next()
+            }else if(to.name === 'attendanceType' && menu.indexOf("SIGN_TYPE") != -1){
+                next()
+            }else if(to.name === 'attendanceTime' && menu.indexOf("SIGN_TIME") != -1){
+                next()
+            }else if(to.name === 'task' && menu.indexOf("TASK_RECORD") != -1){
+                next()
+            }else if(to.name === 'taskSubmit' && menu.indexOf("TASK_SUBMIT") != -1){
+                next()
+            }else if(to.name === 'stats' && menu.indexOf("TASK_SUBMIT") != -1){
+                next()
+            }else {
+                next(from.path)
+            }
         } else {         
             next('/login')
         }
     }else{
-        next()
+        if(token){
+            next('/home')
+        }else{
+            next()
+        }
     }
-    //return next()
 })
 
 export default router

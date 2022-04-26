@@ -23,13 +23,14 @@
         <template #header>
           职位信息
         </template>
-        <n-form ref="formRef" :model="form" :rules="rules">
-          <n-form-item label='职位名称：' path="name">
+        <n-form ref="formRef" :model="form" :rules="rules"
+        label-placement="left" label-width="auto" require-mark-placement="right-hanging">
+          <n-form-item label='职位名称:' path="name">
             <n-input placeholder="请输入职位名称" v-model:value="form.name"   >
 
             </n-input>
           </n-form-item>
-          <n-form-item label='职位菜单权限：' path="menuId">
+          <n-form-item label='职位菜单权限:' path="menuId">
             <n-tree-select
               placeholder="请选择职位菜单权限"
               multiple
@@ -42,14 +43,14 @@
               clearable
             />
           </n-form-item>
-          <n-form-item label='职位操作权限：' path="permissionId">
+          <n-form-item label='职位操作权限:' path="permissionId">
             <n-select placeholder="请选择职位操作权限"
               multiple
               v-model:value="form.permissionId" :options="permissionOptions" clearable>
             </n-select>
           </n-form-item>
         </n-form>
-        <n-button @click="addPosition" type="primary">
+        <n-button @click="addPosition" type="primary" tertiary>
           {{!actionType ? '添加' : '修改'}}
         </n-button>
       </n-drawer-content>
@@ -212,7 +213,6 @@ export default defineComponent({
     //修改     PUT   
     const addPosition = (e) => {
       e.preventDefault()
-      console.log(form.value)
       formRef.value?.validate((errors) => {
           if (!errors) {
             if( !actionType.value ) {
@@ -256,7 +256,6 @@ export default defineComponent({
       permissionArray.value = []
       if( type ) {
         form.value = item
-        console.log(item)
         form.value?.permission.forEach((item) => {
           permissionArray.value.push(item.id)
         })
@@ -265,7 +264,6 @@ export default defineComponent({
           menuArray.value.push(item.id)
         })
         form.value.menuId = menuArray.value
-        console.log(form.value)
         actionType.value = 1
       } else {
         form.value = {

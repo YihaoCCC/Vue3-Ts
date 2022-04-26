@@ -11,17 +11,18 @@
             <template #header>
               考勤时间制度信息
             </template>
-            <n-form ref="formRef" :model="form" :rules="rules">
-              <n-form-item label='考勤时间制度名称' path="name">
+            <n-form ref="formRef" :model="form" :rules="rules"
+            label-placement="left" label-width="auto" require-mark-placement="right-hanging">
+              <n-form-item label='考勤时间制度名称:' path="name">
                 {{form.name}}
                 <!-- <n-input  v-model:value="form.name">
                 </n-input> -->
               </n-form-item>
-              <n-form-item label='时间' path="time">
+              <n-form-item label='时间:' path="time">
                 <n-time-picker v-model:formatted-value="form.time" value-format="HH:mm:ss" clearable/>
               </n-form-item>
             </n-form>
-            <n-button @click="update" type="primary">
+            <n-button @click="update" type="primary" tertiary>
               修改
             </n-button>
           </n-drawer-content>

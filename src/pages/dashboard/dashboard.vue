@@ -88,6 +88,13 @@ import { BookOutline as BookIcon, PersonOutline as PersonIcon, WineOutline as Wi
           PersonOutline,
           RibbonOutline,
           PricetagOutline,
+          HomeOutline,
+          NotificationsOutline,
+          SettingsOutline,
+          BarChartOutline,
+          CheckmarkCircleOutline,
+          LogoUsd,
+          ClipboardOutline
           } from '@vicons/ionicons5'
 
 import { useRouter} from 'vue-router'
@@ -120,7 +127,7 @@ export default defineComponent({
         label: '首页',
         value: 'home',
         key: 'home',
-        icon: renderIcon(BookIcon),
+        icon: renderIcon(HomeOutline),
         routerLink: '/'
       },
       {
@@ -143,7 +150,7 @@ export default defineComponent({
         label: '职位管理',
         key: 'position',
         routerLink: '/position',    
-        icon: renderIcon(BookIcon),
+        icon: renderIcon(PersonOutline),
         disabled: $isAuth('POSITION')
       },
       {
@@ -169,14 +176,14 @@ export default defineComponent({
           {
             label: '奖惩审批',
             key: 'awardApprove',
-            icon: renderIcon(RibbonOutline),
+            icon: renderIcon(CheckmarkCircleOutline),
             routerLink: '/awardApprove',
             disabled: $isAuth('JIANGCHENG_APPROVE')
           },
           {
             label: '奖惩制度',
             key: 'institution',
-            icon: renderIcon(RibbonOutline),
+            icon: renderIcon(SettingsOutline),
             routerLink: '/institution',
             disabled: $isAuth('JIANGCHENG_SYSTEM')
           }
@@ -198,7 +205,7 @@ export default defineComponent({
           {
             label: '请假审批',
             key: 'leaveRequest',
-            icon: renderIcon(PersonOutline),
+            icon: renderIcon(CheckmarkCircleOutline),
             routerLink: '/leaveRequest',
             disabled: $isAuth('LEAVE_APPROVE')
           }
@@ -207,13 +214,13 @@ export default defineComponent({
       {
         label: '出差管理',
         key: 'out',
-        icon: renderIcon(BookIcon),
+        icon: renderIcon(PersonOutline),
         disabled: $isAuth('TRAVEL'),
         children: [
           {
             label: '出差记录',
             key: 'workout',
-            icon: renderIcon(BookIcon),
+            icon: renderIcon(PersonOutline),
             routerLink: '/workout', 
             disabled: $isAuth('TRAVEL_RECORD')   
             
@@ -221,7 +228,7 @@ export default defineComponent({
           {
             label: '出差审批',
             key: 'workoutRequest',
-            icon: renderIcon(BookIcon),
+            icon: renderIcon(CheckmarkCircleOutline),
             routerLink: '/workoutRequest',  
             disabled: $isAuth('TRAVEL_APPROVE')  
             
@@ -231,34 +238,34 @@ export default defineComponent({
       {
         label: '公告管理',
         key: 'message',
-        icon: renderIcon(PersonOutline),
+        icon: renderIcon(NotificationsOutline),
         routerLink: '/message',
         disabled: $isAuth('MESSAGE')
       },
       {
         label: '薪资管理',
         key: 'money',
-        icon: renderIcon(BookIcon),
+        icon: renderIcon(LogoUsd),
         disabled: $isAuth('SALARY'),
         children: [
           {
             label: '薪资记录',
             key: 'moneyRecord',
-            icon: renderIcon(BookIcon),
+            icon: renderIcon(LogoUsd),
             routerLink: '/moneyRecord',
             disabled: $isAuth('SALARY_RECORD')
           },
           {
             label: '薪资制度',
             key: 'moneyInstitution',
-            icon: renderIcon(BookIcon),
+            icon: renderIcon(SettingsOutline),
             routerLink: '/moneyInstitution',
             disabled: $isAuth('SALARY_SYSTEM')
           },
           {
             label: '计算薪资',
             key: 'compute',
-            icon: renderIcon(BookIcon),
+            icon: renderIcon(LogoUsd),
             routerLink: '/compute',
             disabled: $isAuth('SALARY_COMPUTE')
           }
@@ -267,27 +274,27 @@ export default defineComponent({
       {
         label: '考勤管理',
         key: 'Attendance',
-        icon: renderIcon(BookIcon),
+        icon: renderIcon(PersonOutline),
         disabled: $isAuth('SIGN'),
         children: [
               {
                 label: '考勤记录',
                 key: 'signRecord',
-                icon: renderIcon(BookIcon),
+                icon: renderIcon(PersonOutline),
                 routerLink: '/signRecord',
                 disabled: $isAuth('SIGN_RECORD')
               },
               {
                 label: '考勤类型制度',
                 key: 'attendanceType',
-                icon: renderIcon(BookIcon),
+                icon: renderIcon(SettingsOutline),
                 routerLink: '/attendanceType',
                 disabled: $isAuth('SIGN_TYPE')
               },
               {
                 label: '考勤时间制度',
                 key: 'attendanceTime',
-                icon: renderIcon(BookIcon),
+                icon: renderIcon(SettingsOutline),
                 routerLink: '/attendanceTime',
                 disabled: $isAuth('SIGN_TIME')
               },
@@ -296,24 +303,31 @@ export default defineComponent({
       {
         label: '任务管理',
         key: 'task',
-        icon: renderIcon(BookIcon),
+        icon: renderIcon(ClipboardOutline),
         disabled: $isAuth('TASK'),
         children: [
               {
                 label: '任务记录',
                 key: 'task',
-                icon: renderIcon(BookIcon),
+                icon: renderIcon(ClipboardOutline),
                 routerLink: '/task',
                 disabled: $isAuth('TASK_RECORD')
               },
               {
                 label: '我的任务',
                 key: 'taskSubmit',
-                icon: renderIcon(BookIcon),
+                icon: renderIcon(ClipboardOutline),
                 routerLink: '/taskSubmit',
                 disabled: $isAuth('TASK_SUBMIT')
               }
         ]
+      },
+      {
+        label: '统计管理',
+        key: 'stats',
+        icon: renderIcon(BarChartOutline),
+        routerLink: '/stats',
+        disabled: $isAuth('STATS')
       },
 ]
     const currentMenu = ref()

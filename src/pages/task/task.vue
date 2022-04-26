@@ -9,7 +9,7 @@
   >
   <template #header>
     <n-form inline label-placement="left" >
-      <n-form-item label='任务名字：'>
+      <n-form-item label='任务名字:'>
         <n-input placeholder="请输入任务名字"  v-model:value="form3.name" clearable style="width: 145px">
         </n-input>
       </n-form-item>
@@ -40,26 +40,27 @@
         <template #header>
           任务信息
         </template>
-        <n-form ref="formRef" :model="form" :rules="rules">
-          <n-form-item label='任务名字：' path="name">
-            <n-input placeholder="请输入任务名字：" v-model:value="form.name" >
+        <n-form ref="formRef" :model="form" :rules="rules"
+        label-placement="left" label-width="auto" require-mark-placement="right-hanging">
+          <n-form-item label='任务名字:' path="name">
+            <n-input placeholder="请输入任务名字" v-model:value="form.name" >
             </n-input>
           </n-form-item>
-          <n-form-item label='任务内容：' path="content">
+          <n-form-item label='任务内容:' path="content">
             <n-input placeholder="请输入任务内容" type='textarea' v-model:value="form.content" >
             </n-input>
           </n-form-item>
-          <n-form-item label='任务时间：' path="date">
+          <n-form-item label='任务时间:' path="date">
             <n-date-picker v-model:formatted-value="form.date" value-format="yyyy-MM-dd" type="daterange" clearable />
           </n-form-item>
-          <n-form-item label='任务状态：' path="state">
+          <n-form-item label='任务状态:' path="state" v-if="actionType">
             <n-radio-group v-model:value="form.state" name="radiogroup">
               <n-radio value="完成">完成</n-radio>
               <n-radio value='未完成'>未完成</n-radio>
             </n-radio-group>
           </n-form-item>
         </n-form>
-        <n-button @click="addTask" type="primary">
+        <n-button @click="addTask" type="primary" tertiary>
           {{!actionType ? '添加' : '修改'}}
         </n-button>
       </n-drawer-content>
@@ -70,17 +71,18 @@
         <template #header>
           添加员工
         </template>
-        <n-form ref="formRef1" :model="form1" :rules="rules1">
-          <n-form-item label='员工' path="userId">
+        <n-form ref="formRef1" :model="form1" :rules="rules1"
+        label-placement="left" label-width="auto" require-mark-placement="right-hanging">
+          <n-form-item label='员工:' path="userId">
             <n-select placeholder="请选择员工" v-model:value="form1.userId" :options="userOptions">
             </n-select>
           </n-form-item>
-          <n-form-item label='任务要求' path="taskWork">
+          <n-form-item label='任务要求:' path="taskWork">
             <n-input placeholder="请输入任务要求" type='textarea' v-model:value="form1.taskWork" >
             </n-input>
           </n-form-item>
         </n-form>
-        <n-button @click="addUser" type="primary">
+        <n-button @click="addUser" type="primary" tertiary>
           添加
         </n-button>
       </n-drawer-content>
@@ -108,33 +110,32 @@
           任务信息
         </template>
         <n-form ref="formRef2" :model="form2" :rules="rules2"
-        label-placement="left"
-        label-width="auto">
-          <n-form-item label='员工号：' path="userId">
+        label-placement="left" label-width="auto" require-mark-placement="right-hanging">
+          <n-form-item label='员工号:' path="userId">
             {{form2.userId}}
           </n-form-item>
-          <n-form-item label='员工姓名：' path="user.name">
+          <n-form-item label='员工姓名:' path="user.name">
             {{form2.user.name}}
           </n-form-item>
-          <n-form-item label='任务要求：' path="taskWork">
+          <n-form-item label='任务要求:' path="taskWork">
             <n-input placeholder="请输入任务要求" type='textarea' v-model:value="form2.taskWork" >
             </n-input>
           </n-form-item>
-          <n-form-item label='任务提交的内容：' path="content">
+          <n-form-item label='任务提交的内容:' path="content">
             {{form2.content}}
           </n-form-item>
-          <n-form-item label='任务意见：' path="view">
+          <n-form-item label='任务意见:' path="view">
             <n-input placeholder="请输入任务意见" type='textarea' v-model:value="form2.view" >
             </n-input>
           </n-form-item>
-          <n-form-item label='任务状态：' path="state">
+          <n-form-item label='任务状态:' path="state">
             <n-radio-group v-model:value="form2.state" name="radiogroup">
               <n-radio value="完成">完成</n-radio>
               <n-radio value='未完成'>未完成</n-radio>
             </n-radio-group>
           </n-form-item>
         </n-form>
-        <n-button @click="updateUserTask" type="primary">
+        <n-button @click="updateUserTask" type="primary" tertiary>
          修改
         </n-button>
       </n-drawer-content>
@@ -247,7 +248,7 @@ const createColumns = ({ handleActivate,handleActivate1,show }) => {
                                 onClick: () => show(row.id)
                             },
                             
-                            { default: () => '任务详情' }
+                            { default: () => '任务员工详情' }
                         )
                 }
         })

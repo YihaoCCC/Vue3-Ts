@@ -23,24 +23,25 @@
         <template #header>
           部门信息
         </template>
-        <n-form ref="formRef" :model="form" :rules="rules">
-          <n-form-item label='部门名称：' path="name" >
+        <n-form ref="formRef" :model="form" :rules="rules"
+        label-placement="left" label-width="auto" require-mark-placement="right-hanging">
+          <n-form-item label='部门名称:' path="name" >
             <n-input placeholder="请输入部门名称"  v-model:value="form.name" clearable>
 
             </n-input>
           </n-form-item>
-          <n-form-item label='部门邮箱：' path="email">
+          <n-form-item label='部门邮箱:' path="email">
             <n-input placeholder="请输入部门邮箱"  v-model:value="form.email" clearable>
 
             </n-input>
           </n-form-item>
-          <n-form-item label='部门描述：' path="describe">
+          <n-form-item label='部门描述:' path="describe">
             <n-input placeholder="请输入部门描述" type='textarea' v-model:value="form.describe" clearable>
 
             </n-input>
           </n-form-item>
         </n-form>
-        <n-button @click="addDepartment" type="primary">
+        <n-button @click="addDepartment" type="primary" tertiary>
           {{!actionType ? '添加' : '修改'}}
         </n-button>
       </n-drawer-content>
@@ -66,6 +67,10 @@ const createColumns = ({ handleActivate,deleteDepartment }) => {
     {
       title: '部门职责描述',
       key: 'describe'
+    },
+    {
+      title: '部门人数',
+      key: 'userNum'
     },
     {
       title: '部门启用状态',
@@ -132,7 +137,6 @@ const createColumns = ({ handleActivate,deleteDepartment }) => {
 
 
 import {HTTPGetDepartment, HTTPAddDepartMent, HTTPUpdataDepartMent, HTTPDeleteDepartment} from './HttpMethods'
-import { tr } from 'element-plus/lib/locale'
 export default defineComponent({
   setup () {
     const formRef = ref(null);

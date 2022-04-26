@@ -16,13 +16,12 @@ const app = createApp(App)
 // 取消全局挂载，在CKhttp的实例中写一个 getinstance的方法把axios实例返回出去，供外部调用get等方法
 // app.config.globalProperties.$ckHttp = ckHttp
 
-
+//操作权限
 app.config.globalProperties.isAuthPer = function (tag:string) {
     let flag = true
-    const permisson:any = localStorage.getItem('permission')
-    const permissionAaary = permisson.split(',') 
+    const permisson:any = JSON.parse(localStorage.getItem('permission') || "[]")
    
-    for (const item of permissionAaary ) { 
+    for (const item of permisson ) { 
         if(item === tag) {
             flag = false
             break
@@ -30,13 +29,12 @@ app.config.globalProperties.isAuthPer = function (tag:string) {
     }
     return flag
 }
-
+//菜单权限
 app.config.globalProperties.isAuth = function (tag:string) {
     let flag = true
-    const menu:any = localStorage.getItem('MENU')
-    const menuArray = menu.split(',')
+    const menu:any = JSON.parse(localStorage.getItem('MENU') || "[]")
    
-    for (const item of menuArray ) { 
+    for (const item of menu ) { 
         if(item === tag) {
             flag = false
             break
